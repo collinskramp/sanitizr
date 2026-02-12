@@ -1,0 +1,9 @@
+node_modules
+
+# Test files with fake secrets (for sanitizer testing)
+test-*.html
+test-*.js
+debug-*.html
+debug-*.js
+*.test.html
+*.test.js

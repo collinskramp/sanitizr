@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html>
+<head><title>Quick Test</title></head>
+<body>
+<script src="storage.js"></script>
+<script src="sanitizer.js"></script>
+<script>
+// Reset to get new rules
+window.storage.resetToDefaults();
+
+const testInput = `{"aws": {"password": "AKIAFAKE1234567890","secretAccessKey": "wJalrXUtnFEMI/K7MDENG/bPxRfiCYFAKE","region": "us-east-1"}}`;
+const rules = window.storage.getRules();
+
+console.log('Input:', testInput);
+console.log('Rules loaded:', rules.length);
+
+// Check for secretAccessKey rule
+const secretRule = rules.find(r => r.type === 'kv' && r.pattern === 'secretAccessKey');
+console.log('SecretAccessKey rule exists:', !!secretRule, secretRule?.enabled);
+
+// Test detection
+const detections = window.sanitizer.detect(testInput, { rules });
+console.log('Detections:', detections.length);
+detections.forEach(d => console.log('  -', d.ruleId, d.match));
+
+// Test sanitization
+const sanitized = window.sanitizer.sanitize(testInput, { rules });
+console.log('Original:', testInput);
+console.log('Sanitized:', sanitized);
+console.log('Changed:', sanitized !== testInput);
+
+if (sanitized !== testInput) {
+    console.log('✅ SUCCESS: AWS credentials detected and sanitized!');
+} else {
+    console.log('❌ FAILED: AWS credentials not sanitized');
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,732 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Settings - AISanitizr</title>
+    <link rel="stylesheet" href="modern-styles.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body { 
+            font-family: 'Inter', var(--font-sans); 
+            background: linear-gradient(135deg, var(--gray-50) 0%, var(--primary-50) 100%);
+            min-height: 100vh;
+            margin: 0;
+        }
+        
+        .settings-container {
+            max-width: 900px;
+            margin: 0 auto;
+            padding: var(--space-8) var(--space-6);
+        }
+        
+        .settings-header {
+            text-align: center;
+            margin-bottom: var(--space-12);
+        }
+        
+        .settings-title {
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: var(--gray-900);
+            margin-bottom: var(--space-4);
+        }
+        
+        .settings-subtitle {
+            font-size: 1.125rem;
+            color: var(--gray-600);
+            max-width: 600px;
+            margin: 0 auto;
+        }
+        
+        .settings-grid {
+            display: grid;
+            gap: var(--space-6);
+        }
+        
+        .setting-section {
+            background: rgba(255, 255, 255, 0.8);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: var(--radius-2xl);
+            box-shadow: var(--shadow-xl);
+            padding: var(--space-8);
+            transition: all var(--transition-normal);
+        }
+        
+        .setting-section:hover {
+            box-shadow: 0 25px 50px -12px rgb(0 0 0 / 0.25);
+            transform: translateY(-2px);
+        }
+        
+        .section-header {
+            display: flex;
+            align-items: center;
+            gap: var(--space-3);
+            margin-bottom: var(--space-6);
+            padding-bottom: var(--space-4);
+            border-bottom: 1px solid var(--gray-200);
+        }
+        
+        .section-icon {
+            width: 40px;
+            height: 40px;
+            background: linear-gradient(135deg, var(--primary-600), var(--primary-500));
+            border-radius: var(--radius-lg);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 1.25rem;
+        }
+        
+        .section-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: var(--gray-900);
+            margin: 0;
+        }
+        
+        .section-description {
+            font-size: 0.875rem;
+            color: var(--gray-600);
+            margin-top: var(--space-1);
+        }
+        
+        .setting-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: var(--space-4) 0;
+            border-bottom: 1px solid var(--gray-100);
+        }
+        
+        .setting-item:last-child {
+            border-bottom: none;
+        }
+        
+        .setting-info {
+            flex: 1;
+        }
+        
+        .setting-name {
+            font-size: 0.875rem;
+            font-weight: 500;
+            color: var(--gray-900);
+            margin-bottom: var(--space-1);
+        }
+        
+        .setting-desc {
+            font-size: 0.75rem;
+            color: var(--gray-600);
+        }
+        
+        .setting-control {
+            margin-left: var(--space-4);
+        }
+        
+        .back-button {
+            position: fixed;
+            top: var(--space-6);
+            left: var(--space-6);
+            z-index: 100;
+        }
+        
+        .storage-usage {
+            background: var(--gray-50);
+            padding: var(--space-4);
+            border-radius: var(--radius-lg);
+            margin: var(--space-4) 0;
+        }
+        
+        .usage-bar {
+            background: var(--gray-200);
+            height: 8px;
+            border-radius: var(--radius-md);
+            overflow: hidden;
+            margin: var(--space-2) 0;
+        }
+        
+        .usage-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--success-500), var(--success-400));
+            transition: width var(--transition-slow);
+        }
+        
+        .usage-fill.warning { 
+            background: linear-gradient(90deg, var(--warning-500), var(--warning-400)); 
+        }
+        
+        .usage-fill.danger { 
+            background: linear-gradient(90deg, var(--error-500), var(--error-400)); 
+        }
+        
+        .theme-preview {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: var(--space-3);
+            margin: var(--space-4) 0;
+        }
+        
+        .theme-option {
+            padding: var(--space-4);
+            border: 2px solid var(--gray-200);
+            border-radius: var(--radius-lg);
+            cursor: pointer;
+            text-align: center;
+            transition: all var(--transition-fast);
+            background: white;
+        }
+        
+        .theme-option:hover {
+            border-color: var(--primary-300);
+            transform: translateY(-2px);
+        }
+        
+        .theme-option.active {
+            border-color: var(--primary-500);
+            background: var(--primary-50);
+        }
+        
+        .theme-option.light {
+            background: white;
+            color: var(--gray-900);
+        }
+        
+        .theme-option.dark {
+            background: var(--gray-800);
+            color: white;
+        }
+        
+        .theme-option.system {
+            background: linear-gradient(45deg, white 50%, var(--gray-800) 50%);
+            color: var(--gray-900);
+        }
+        
+        .actions-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: var(--space-3);
+            margin-top: var(--space-6);
+        }
+        
+        .status-message {
+            margin-top: var(--space-4);
+            padding: var(--space-3);
+            border-radius: var(--radius-lg);
+            text-align: center;
+            font-size: 0.875rem;
+        }
+        
+        .status-success {
+            background: var(--success-50);
+            color: var(--success-700);
+            border: 1px solid var(--success-200);
+        }
+        
+        .status-warning {
+            background: var(--warning-50);
+            color: var(--warning-700);
+            border: 1px solid var(--warning-200);
+        }
+        
+        .status-error {
+            background: var(--error-50);
+            color: var(--error-700);
+            border: 1px solid var(--error-200);
+        }
+    </style>
+</head>
+<body>
+    <!-- Back Button -->
+    <button class="btn btn-secondary back-button" onclick="window.close()">
+        ← Back
+    </button>
+
+    <div class="settings-container">
+        <!-- Header -->
+        <div class="settings-header">
+            <h1 class="settings-title">Settings</h1>
+            <p class="settings-subtitle">
+                Configure your AISanitizr preferences and manage your data
+            </p>
+        </div>
+
+        <div class="settings-grid">
+            <!-- General Settings -->
+            <div class="setting-section">
+                <div class="section-header">
+                    <div class="section-icon">⚙️</div>
+                    <div>
+                        <h2 class="section-title">General Settings</h2>
+                        <p class="section-description">Core application preferences</p>
+                    </div>
+                </div>
+
+                <div class="setting-item">
+                    <div class="setting-info">
+                        <div class="setting-name">Real-time Processing</div>
+                        <div class="setting-desc">Automatically sanitize text as you type</div>
+                    </div>
+                    <div class="setting-control">
+                        <div class="toggle-switch">
+                            <input type="checkbox" id="realTimeProcessing">
+                            <span class="toggle-slider"></span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="setting-item">
+                    <div class="setting-info">
+                        <div class="setting-name">Deterministic Replacement</div>
+                        <div class="setting-desc">Generate consistent replacements for the same input</div>
+                    </div>
+                    <div class="setting-control">
+                        <div class="toggle-switch">
+                            <input type="checkbox" id="deterministicReplacement">
+                            <span class="toggle-slider"></span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="setting-item">
+                    <div class="setting-info">
+                        <div class="setting-name">Preserve Formatting</div>
+                        <div class="setting-desc">Maintain original text structure and spacing</div>
+                    </div>
+                    <div class="setting-control">
+                        <div class="toggle-switch">
+                            <input type="checkbox" id="preserveFormatting">
+                            <span class="toggle-slider"></span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="setting-item">
+                    <div class="setting-info">
+                        <div class="setting-name">Show Warnings</div>
+                        <div class="setting-desc">Display warning messages and notifications</div>
+                    </div>
+                    <div class="setting-control">
+                        <div class="toggle-switch">
+                            <input type="checkbox" id="showWarnings">
+                            <span class="toggle-slider"></span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="setting-item">
+                    <div class="setting-info">
+                        <div class="setting-name">Input Debounce Delay</div>
+                        <div class="setting-desc">Delay before processing input changes (0-2000ms)</div>
+                    </div>
+                    <div class="setting-control">
+                        <input type="number" id="debounceDelay" class="form-input" style="width: 100px;" min="0" max="2000" step="50">
+                    </div>
+                </div>
+
+                <div class="setting-item">
+                    <div class="setting-info">
+                        <div class="setting-name">Maximum History Entries</div>
+                        <div class="setting-desc">Maximum number of history entries to keep (10-1000)</div>
+                    </div>
+                    <div class="setting-control">
+                        <input type="number" id="maxHistoryEntries" class="form-input" style="width: 100px;" min="10" max="1000" step="10">
+                    </div>
+                </div>
+            </div>
+
+            <!-- Theme Settings -->
+            <div class="setting-section">
+                <div class="section-header">
+                    <div class="section-icon">🎨</div>
+                    <div>
+                        <h2 class="section-title">Theme Settings</h2>
+                        <p class="section-description">Customize the appearance</p>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Choose Theme</label>
+                    <div class="theme-preview">
+                        <div class="theme-option light" data-theme="light">
+                            <div style="font-size: 1.5rem; margin-bottom: var(--space-2);">☀️</div>
+                            <div>Light</div>
+                        </div>
+                        <div class="theme-option dark" data-theme="dark">
+                            <div style="font-size: 1.5rem; margin-bottom: var(--space-2);">🌙</div>
+                            <div>Dark</div>
+                        </div>
+                        <div class="theme-option system" data-theme="system">
+                            <div style="font-size: 1.5rem; margin-bottom: var(--space-2);">🖥️</div>
+                            <div>System</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Storage Management -->
+            <div class="setting-section">
+                <div class="section-header">
+                    <div class="section-icon">💾</div>
+                    <div>
+                        <h2 class="section-title">Storage Management</h2>
+                        <p class="section-description">Manage your local data storage</p>
+                    </div>
+                </div>
+
+                <div class="storage-usage" id="storageUsage">
+                    <!-- Storage usage will be populated by JavaScript -->
+                </div>
+
+                <div class="status-message" style="background: var(--primary-50); color: var(--primary-700); border: 1px solid var(--primary-200);">
+                    <strong>💡 Privacy Note:</strong> All data is stored locally in your browser. 
+                    No information is sent to external servers.
+                </div>
+
+                <div class="actions-grid">
+                    <button class="btn btn-success" id="exportDataBtn">📤 Export All Data</button>
+                    <button class="btn btn-primary" id="importDataBtn">📥 Import Data</button>
+                    <button class="btn btn-danger" id="clearDataBtn">🗑️ Clear All Data</button>
+                </div>
+            </div>
+
+            <!-- Advanced Settings -->
+            <div class="setting-section">
+                <div class="section-header">
+                    <div class="section-icon">🔧</div>
+                    <div>
+                        <h2 class="section-title">Advanced Settings</h2>
+                        <p class="section-description">Advanced configuration options</p>
+                    </div>
+                </div>
+
+                <div class="status-message status-warning">
+                    <strong>⚠️ Warning:</strong> These settings are for advanced users. 
+                    Changing these values may affect performance or functionality.
+                </div>
+
+                <div class="setting-item">
+                    <div class="setting-info">
+                        <div class="setting-name">Debug Mode</div>
+                        <div class="setting-desc">Enable detailed logging and debug information</div>
+                    </div>
+                    <div class="setting-control">
+                        <div class="toggle-switch">
+                            <input type="checkbox" id="debugMode">
+                            <span class="toggle-slider"></span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="setting-item">
+                    <div class="setting-info">
+                        <div class="setting-name">Performance Monitoring</div>
+                        <div class="setting-desc">Show performance metrics and timing information</div>
+                    </div>
+                    <div class="setting-control">
+                        <div class="toggle-switch">
+                            <input type="checkbox" id="performanceMonitoring">
+                            <span class="toggle-slider"></span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Actions -->
+            <div class="setting-section">
+                <div class="section-header">
+                    <div class="section-icon">💾</div>
+                    <div>
+                        <h2 class="section-title">Actions</h2>
+                        <p class="section-description">Save, load, or reset your settings</p>
+                    </div>
+                </div>
+
+                <div class="actions-grid">
+                    <button class="btn btn-success" id="saveSettingsBtn">💾 Save Settings</button>
+                    <button class="btn btn-secondary" id="loadSettingsBtn">🔄 Reload Settings</button>
+                    <button class="btn btn-danger" id="resetSettingsBtn">🔄 Reset to Defaults</button>
+                    <button class="btn btn-primary" id="debugSettingsBtn">🐛 Debug Info</button>
+                </div>
+
+                <div id="saveStatus">
+                    <!-- Save status will be shown here -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="storage.js"></script>
+    <script>
+        const storage = window.storage;
+        let currentSettings = {};
+
+        // Initialize the page
+        document.addEventListener('DOMContentLoaded', function() {
+            if (!window.storage) {
+                console.error('Storage module not available');
+                document.getElementById('saveStatus').innerHTML = '<div class="status-message status-error">❌ Storage module not loaded. Please refresh the page.</div>';
+                return;
+            }
+            
+            console.log('Settings page initialized');
+            loadSettings();
+            setupEventListeners();
+            updateStorageUsage();
+        });
+
+        function setupEventListeners() {
+            try {
+                // Theme selection
+                document.querySelectorAll('.theme-option').forEach(option => {
+                    option.addEventListener('click', function() {
+                        selectTheme(this.dataset.theme);
+                    });
+                });
+                
+                // Auto-save on changes
+                const inputs = document.querySelectorAll('input, select');
+                inputs.forEach(input => {
+                    input.addEventListener('change', function() {
+                        setTimeout(saveSettings, 500); // Auto-save after 500ms
+                    });
+                });
+                
+                // Action buttons
+                document.getElementById('exportDataBtn').addEventListener('click', exportAllData);
+                document.getElementById('importDataBtn').addEventListener('click', importAllData);
+                document.getElementById('clearDataBtn').addEventListener('click', clearAllData);
+                document.getElementById('saveSettingsBtn').addEventListener('click', saveSettings);
+                document.getElementById('loadSettingsBtn').addEventListener('click', loadSettings);
+                document.getElementById('resetSettingsBtn').addEventListener('click', resetSettings);
+                document.getElementById('debugSettingsBtn').addEventListener('click', debugSettings);
+            } catch (error) {
+                console.error('Error setting up event listeners:', error);
+            }
+        }
+
+        function loadSettings() {
+            try {
+                currentSettings = storage.getSettings();
+                
+                // Update UI elements
+                const elements = {
+                    'realTimeProcessing': currentSettings.realTimeProcessing,
+                    'deterministicReplacement': currentSettings.deterministicReplacement,
+                    'preserveFormatting': currentSettings.preserveFormatting,
+                    'showWarnings': currentSettings.showWarnings,
+                    'debounceDelay': currentSettings.debounceDelay,
+                    'maxHistoryEntries': currentSettings.maxHistoryEntries,
+                    'debugMode': currentSettings.debugMode || false,
+                    'performanceMonitoring': currentSettings.performanceMonitoring || false
+                };
+                
+                for (const [id, value] of Object.entries(elements)) {
+                    const element = document.getElementById(id);
+                    if (element) {
+                        if (element.type === 'checkbox') {
+                            element.checked = Boolean(value);
+                        } else {
+                            element.value = value;
+                        }
+                    }
+                }
+                
+                // Theme selection
+                selectTheme(currentSettings.theme || 'system');
+            } catch (error) {
+                console.error('Error loading settings:', error);
+                showStatus('❌ Error loading settings: ' + error.message, 'error');
+            }
+        }
+
+        function selectTheme(theme) {
+            // Update UI
+            document.querySelectorAll('.theme-option').forEach(option => {
+                option.classList.remove('active');
+            });
+            const themeOption = document.querySelector(`[data-theme="${theme}"]`);
+            if (themeOption) {
+                themeOption.classList.add('active');
+            }
+            
+            // Apply theme to current page
+            document.body.className = `theme-${theme}`;
+            
+            currentSettings.theme = theme;
+        }
+
+        function saveSettings() {
+            try {
+                // Collect all settings
+                const settings = {
+                    ...currentSettings,
+                    realTimeProcessing: document.getElementById('realTimeProcessing').checked,
+                    deterministicReplacement: document.getElementById('deterministicReplacement').checked,
+                    preserveFormatting: document.getElementById('preserveFormatting').checked,
+                    showWarnings: document.getElementById('showWarnings').checked,
+                    debounceDelay: parseInt(document.getElementById('debounceDelay').value) || 300,
+                    maxHistoryEntries: parseInt(document.getElementById('maxHistoryEntries').value) || 100,
+                    debugMode: document.getElementById('debugMode').checked,
+                    performanceMonitoring: document.getElementById('performanceMonitoring').checked
+                };
+                
+                const success = storage.saveSettings(settings);
+                
+                if (success) {
+                    showStatus('✅ Settings saved successfully!', 'success');
+                    currentSettings = settings;
+                } else {
+                    showStatus('❌ Failed to save settings', 'error');
+                }
+            } catch (error) {
+                console.error('Error saving settings:', error);
+                showStatus('❌ Error saving settings: ' + error.message, 'error');
+            }
+        }
+
+        function resetSettings() {
+            if (confirm('Are you sure you want to reset all settings to defaults?')) {
+                const defaultSettings = storage.getDefaultSettings();
+                const success = storage.saveSettings(defaultSettings);
+                
+                if (success) {
+                    loadSettings();
+                    showStatus('✅ Settings reset to defaults!', 'success');
+                } else {
+                    showStatus('❌ Failed to reset settings', 'error');
+                }
+            }
+        }
+
+        function updateStorageUsage() {
+            try {
+                const usage = storage.getStorageUsage();
+                const usageDiv = document.getElementById('storageUsage');
+                
+                let fillClass = '';
+                if (usage.percentage > 90) fillClass = 'danger';
+                else if (usage.percentage > 70) fillClass = 'warning';
+                
+                usageDiv.innerHTML = `
+                    <h4 style="margin: 0 0 var(--space-3) 0; font-size: 1rem; font-weight: 600;">Storage Usage</h4>
+                    <div class="usage-bar">
+                        <div class="usage-fill ${fillClass}" style="width: ${usage.percentage}%"></div>
+                    </div>
+                    <div style="display: flex; justify-content: space-between; font-size: 0.75rem; color: var(--gray-600);">
+                        <span>Used: ${(usage.used / 1024).toFixed(1)} KB</span>
+                        <span>${usage.percentage}%</span>
+                        <span>Available: ${(usage.available / 1024).toFixed(1)} KB</span>
+                    </div>
+                    ${usage.percentage > 80 ? '<div class="status-message status-warning" style="margin-top: var(--space-3);"><strong>⚠️ Storage Warning:</strong> You are running low on storage space. Consider clearing old history entries.</div>' : ''}
+                `;
+            } catch (error) {
+                console.error('Error updating storage usage:', error);
+                document.getElementById('storageUsage').innerHTML = '<div class="status-message status-error">❌ Error loading storage usage</div>';
+            }
+        }
+
+        function exportAllData() {
+            try {
+                const data = storage.exportData();
+                
+                const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = `aisanitizr-backup-${new Date().toISOString().split('T')[0]}.json`;
+                a.click();
+                URL.revokeObjectURL(url);
+                
+                showStatus('✅ Data exported successfully!', 'success');
+            } catch (error) {
+                console.error('Error exporting data:', error);
+                showStatus('❌ Error exporting data: ' + error.message, 'error');
+            }
+        }
+
+        function importAllData() {
+            try {
+                const input = document.createElement('input');
+                input.type = 'file';
+                input.accept = '.json';
+                input.onchange = function(event) {
+                    const file = event.target.files[0];
+                    if (file) {
+                        const reader = new FileReader();
+                        reader.onload = function(e) {
+                            try {
+                                const data = JSON.parse(e.target.result);
+                                
+                                if (confirm(`Import data from ${data.exportDate ? new Date(data.exportDate).toLocaleDateString() : 'unknown date'}? This will replace all current data.`)) {
+                                    const success = storage.importData(data);
+                                    
+                                    if (success) {
+                                        loadSettings();
+                                        updateStorageUsage();
+                                        showStatus('✅ Data imported successfully!', 'success');
+                                    } else {
+                                        showStatus('❌ Failed to import data', 'error');
+                                    }
+                                }
+                            } catch (error) {
+                                console.error('Error parsing import file:', error);
+                                showStatus('❌ Invalid backup file format', 'error');
+                            }
+                        };
+                        reader.readAsText(file);
+                    }
+                };
+                input.click();
+            } catch (error) {
+                console.error('Error importing data:', error);
+                showStatus('❌ Error importing data: ' + error.message, 'error');
+            }
+        }
+
+        function clearAllData() {
+            if (confirm('Are you sure you want to clear ALL data? This includes rules, history, settings, and profiles. This cannot be undone.')) {
+                if (confirm('This is your final warning. ALL DATA WILL BE PERMANENTLY DELETED. Continue?')) {
+                    try {
+                        localStorage.clear();
+                        storage.initializeStorage();
+                        loadSettings();
+                        updateStorageUsage();
+                        showStatus('✅ All data cleared successfully!', 'success');
+                    } catch (error) {
+                        showStatus('❌ Failed to clear data: ' + error.message, 'error');
+                    }
+                }
+            }
+        }
+
+        function debugSettings() {
+            console.log('=== DEBUG SETTINGS ===');
+            console.log('Storage object:', window.storage);
+            console.log('Current settings:', currentSettings);
+            
+            const debugInfo = {
+                storageAvailable: !!window.storage,
+                currentSettings: currentSettings,
+                storageUsage: storage.getStorageUsage(),
+                defaultSettings: storage.getDefaultSettings()
+            };
+            
+            console.log('Debug info:', debugInfo);
+            showStatus('🐛 Debug information logged to console', 'success');
+        }
+
+        function showStatus(message, type) {
+            const statusDiv = document.getElementById('saveStatus');
+            statusDiv.innerHTML = `<div class="status-message status-${type}">${message}</div>`;
+            
+            setTimeout(() => {
+                statusDiv.innerHTML = '';
+            }, 3000);
+        }
+    </script>
+</body>
+</html>

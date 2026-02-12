@@ -1,0 +1,715 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Manage Rules - Data Sanitizer</title>
+    <style>
+        body { 
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; 
+            padding: 20px; 
+            background: #f8f9fa; 
+            margin: 0;
+        }
+        .container { max-width: 1200px; margin: 0 auto; }
+        .header { 
+            text-align: center; 
+            padding: 20px 0; 
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border-radius: 12px;
+            margin-bottom: 20px;
+        }
+        .header h1 { margin: 0; font-size: 28px; }
+        .header p { margin: 10px 0 0 0; opacity: 0.9; }
+        
+        .card { 
+            background: white; 
+            padding: 24px; 
+            margin: 20px 0; 
+            border-radius: 12px; 
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1); 
+            border: 1px solid #e9ecef;
+        }
+        
+        .rule-item {
+            background: #f8f9fa;
+            border: 1px solid #e9ecef;
+            border-radius: 8px;
+            padding: 16px;
+            margin: 12px 0;
+            transition: all 0.2s;
+        }
+        .rule-item:hover {
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+        .rule-item.disabled {
+            opacity: 0.6;
+            background: #f1f3f4;
+        }
+        
+        .rule-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 8px;
+        }
+        .rule-name {
+            font-weight: 600;
+            font-size: 16px;
+            color: #495057;
+        }
+        .rule-category {
+            background: #667eea;
+            color: white;
+            padding: 4px 8px;
+            border-radius: 12px;
+            font-size: 12px;
+            text-transform: uppercase;
+        }
+        .rule-category.pii { background: #dc3545; }
+        .rule-category.secrets { background: #fd7e14; }
+        .rule-category.company { background: #20c997; }
+        .rule-category.custom { background: #6f42c1; }
+        
+        .rule-details {
+            font-size: 14px;
+            color: #6c757d;
+            margin: 8px 0;
+        }
+        .rule-pattern {
+            font-family: 'Courier New', monospace;
+            background: #e9ecef;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 12px;
+        }
+        
+        .rule-controls {
+            display: flex;
+            gap: 8px;
+            margin-top: 12px;
+        }
+        
+        .btn {
+            padding: 8px 16px;
+            border: none;
+            border-radius: 6px;
+            font-size: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .btn-primary { background: #667eea; color: white; }
+        .btn-primary:hover { background: #5a6fd8; }
+        .btn-secondary { background: #6c757d; color: white; }
+        .btn-secondary:hover { background: #5a6268; }
+        .btn-success { background: #28a745; color: white; }
+        .btn-success:hover { background: #218838; }
+        .btn-danger { background: #dc3545; color: white; }
+        .btn-danger:hover { background: #c82333; }
+        .btn-warning { background: #ffc107; color: #212529; }
+        .btn-warning:hover { background: #e0a800; }
+        
+        .toggle-switch {
+            position: relative;
+            display: inline-block;
+            width: 50px;
+            height: 24px;
+        }
+        .toggle-switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+        .slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: #ccc;
+            transition: .4s;
+            border-radius: 24px;
+        }
+        .slider:before {
+            position: absolute;
+            content: "";
+            height: 18px;
+            width: 18px;
+            left: 3px;
+            bottom: 3px;
+            background-color: white;
+            transition: .4s;
+            border-radius: 50%;
+        }
+        input:checked + .slider {
+            background-color: #667eea;
+        }
+        input:checked + .slider:before {
+            transform: translateX(26px);
+        }
+        
+        .filter-controls {
+            display: flex;
+            gap: 16px;
+            align-items: center;
+            margin: 20px 0;
+            flex-wrap: wrap;
+        }
+        .filter-controls select, .filter-controls input {
+            padding: 8px 12px;
+            border: 1px solid #e9ecef;
+            border-radius: 6px;
+            font-size: 14px;
+        }
+        
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 16px;
+            margin: 20px 0;
+        }
+        .stat-card {
+            background: #f8f9fa;
+            padding: 16px;
+            border-radius: 8px;
+            text-align: center;
+            border: 1px solid #e9ecef;
+        }
+        .stat-number {
+            font-size: 24px;
+            font-weight: bold;
+            color: #667eea;
+            margin-bottom: 4px;
+        }
+        .stat-label {
+            font-size: 12px;
+            color: #6c757d;
+            text-transform: uppercase;
+        }
+        
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.5);
+        }
+        .modal-content {
+            background-color: white;
+            margin: 5% auto;
+            padding: 20px;
+            border-radius: 8px;
+            width: 80%;
+            max-width: 600px;
+            max-height: 80vh;
+            overflow-y: auto;
+        }
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid #e9ecef;
+        }
+        .close {
+            font-size: 28px;
+            font-weight: bold;
+            cursor: pointer;
+            color: #aaa;
+        }
+        .close:hover {
+            color: #000;
+        }
+        
+        .form-group {
+            margin: 16px 0;
+        }
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #495057;
+        }
+        .form-group input, .form-group select, .form-group textarea {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #e9ecef;
+            border-radius: 6px;
+            font-size: 14px;
+        }
+        .form-group textarea {
+            resize: vertical;
+            min-height: 80px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>⚙️ Manage Rules</h1>
+            <p>Configure detection patterns and sanitization rules</p>
+        </div>
+        
+        <!-- Statistics -->
+        <div class="card">
+            <h3>📊 Rule Statistics</h3>
+            <div class="stats" id="ruleStats">
+                <!-- Stats will be populated by JavaScript -->
+            </div>
+        </div>
+        
+        <!-- Controls -->
+        <div class="card">
+            <div class="filter-controls">
+                <label>
+                    Filter by Category:
+                    <select id="categoryFilter">
+                        <option value="">All Categories</option>
+                        <option value="pii">PII</option>
+                        <option value="secrets">Secrets</option>
+                        <option value="company">Company</option>
+                        <option value="custom">Custom</option>
+                    </select>
+                </label>
+                
+                <label>
+                    Filter by Type:
+                    <select id="typeFilter">
+                        <option value="">All Types</option>
+                        <option value="builtin">Built-in</option>
+                        <option value="regex">Regex</option>
+                        <option value="literal">Literal</option>
+                        <option value="kv">Key-Value</option>
+                    </select>
+                </label>
+                
+                <label>
+                    Search:
+                    <input type="text" id="searchFilter" placeholder="Search rules...">
+                </label>
+                
+                <button class="btn btn-success" id="addRuleBtn">+ Add Rule</button>
+                <button class="btn btn-secondary" id="resetDefaultsBtn">Reset to Defaults</button>
+                <button class="btn btn-primary" id="exportRulesBtn">Export Rules</button>
+                <button class="btn btn-primary" id="importRulesBtn">Import Rules</button>
+            </div>
+        </div>
+        
+        <!-- Rules List -->
+        <div class="card">
+            <h3>📋 Rules List</h3>
+            <div id="rulesList">
+                <!-- Rules will be populated by JavaScript -->
+            </div>
+        </div>
+    </div>
+    
+    <!-- Add/Edit Rule Modal -->
+    <div id="ruleModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 id="modalTitle">Add New Rule</h3>
+                <span class="close" id="modalCloseBtn">&times;</span>
+            </div>
+            
+            <form id="ruleForm">
+                <div class="form-group">
+                    <label for="ruleName">Rule Name</label>
+                    <input type="text" id="ruleName" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="ruleType">Rule Type</label>
+                    <select id="ruleType" required onchange="updatePatternField()">
+                        <option value="literal">Literal Text</option>
+                        <option value="regex">Regular Expression</option>
+                        <option value="builtin">Built-in Pattern</option>
+                        <option value="kv">Key-Value Pair</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label for="rulePattern">Pattern</label>
+                    <input type="text" id="rulePattern" required>
+                    <small id="patternHelp">Enter the text or pattern to detect</small>
+                </div>
+                
+                <div class="form-group">
+                    <label for="ruleCategory">Category</label>
+                    <select id="ruleCategory" required>
+                        <option value="pii">Personal Information (PII)</option>
+                        <option value="secrets">Secrets & Credentials</option>
+                        <option value="company">Company Information</option>
+                        <option value="custom">Custom</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label for="ruleReplacement">Replacement Text (optional)</label>
+                    <input type="text" id="ruleReplacement" placeholder="Leave empty for automatic replacement">
+                </div>
+                
+                <div class="form-group">
+                    <label for="ruleDescription">Description</label>
+                    <textarea id="ruleDescription" placeholder="Describe what this rule detects"></textarea>
+                </div>
+                
+                <div class="form-group">
+                    <label>
+                        <input type="checkbox" id="ruleEnabled" checked> Enabled
+                    </label>
+                </div>
+                
+                <div style="text-align: right; margin-top: 20px;">
+                    <button type="button" class="btn btn-secondary" id="modalCancelBtn">Cancel</button>
+                    <button type="submit" class="btn btn-primary">Save Rule</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script src="storage.js"></script>
+    <script src="sanitizer-engine-bulletproof.js"></script>
+    <script>
+        const storage = window.storage;
+        let rules = [];
+        let editingRuleIndex = -1;
+
+        // Initialize the page
+        document.addEventListener('DOMContentLoaded', function() {
+            loadRules();
+            setupEventListeners();
+        });
+
+        function setupEventListeners() {
+            document.getElementById('categoryFilter').addEventListener('change', filterRules);
+            document.getElementById('typeFilter').addEventListener('change', filterRules);
+            document.getElementById('searchFilter').addEventListener('input', filterRules);
+            document.getElementById('ruleForm').addEventListener('submit', saveRule);
+            
+            // Main action buttons
+            document.getElementById('addRuleBtn').addEventListener('click', showAddRuleModal);
+            document.getElementById('resetDefaultsBtn').addEventListener('click', resetToDefaults);
+            document.getElementById('exportRulesBtn').addEventListener('click', exportRules);
+            document.getElementById('importRulesBtn').addEventListener('click', importRules);
+            
+            // Modal buttons
+            document.getElementById('modalCloseBtn').addEventListener('click', closeModal);
+            document.getElementById('modalCancelBtn').addEventListener('click', closeModal);
+        }
+
+        function loadRules() {
+            rules = storage.getRules();
+            displayRules();
+            updateStats();
+        }
+
+        function displayRules(filteredRules = null) {
+            const rulesToShow = filteredRules || rules;
+            const container = document.getElementById('rulesList');
+            
+            if (rulesToShow.length === 0) {
+                container.innerHTML = '<p style="text-align: center; color: #6c757d; padding: 40px;">No rules found</p>';
+                return;
+            }
+            
+            container.innerHTML = rulesToShow.map((rule, index) => `
+                <div class="rule-item ${!rule.enabled ? 'disabled' : ''}">
+                    <div class="rule-header">
+                        <div class="rule-name">${rule.name || rule.pattern}</div>
+                        <div class="rule-category ${rule.category}">${rule.category}</div>
+                    </div>
+                    
+                    <div class="rule-details">
+                        <div><strong>Type:</strong> ${rule.type}</div>
+                        <div><strong>Pattern:</strong> <span class="rule-pattern">${rule.pattern}</span></div>
+                        ${rule.description ? `<div><strong>Description:</strong> ${rule.description}</div>` : ''}
+                        ${rule.replacement ? `<div><strong>Replacement:</strong> ${rule.replacement}</div>` : ''}
+                    </div>
+                    
+                    <div class="rule-controls">
+                        <label class="toggle-switch">
+                            <input type="checkbox" ${rule.enabled ? 'checked' : ''} 
+                                   data-rule-index="${rules.indexOf(rule)}">
+                            <span class="slider"></span>
+                        </label>
+                        <button class="btn btn-primary" data-action="edit" data-rule-index="${rules.indexOf(rule)}">Edit</button>
+                        <button class="btn btn-warning" data-action="test" data-rule-index="${rules.indexOf(rule)}">Test</button>
+                        <button class="btn btn-danger" data-action="delete" data-rule-index="${rules.indexOf(rule)}">Delete</button>
+                    </div>
+                </div>
+            `).join('');
+            
+            // Add event listeners to dynamically created elements
+            container.querySelectorAll('input[type="checkbox"]').forEach(checkbox => {
+                checkbox.addEventListener('change', function() {
+                    const index = parseInt(this.dataset.ruleIndex);
+                    toggleRule(index);
+                });
+            });
+            
+            container.querySelectorAll('button[data-action]').forEach(button => {
+                button.addEventListener('click', function() {
+                    const action = this.dataset.action;
+                    const index = parseInt(this.dataset.ruleIndex);
+                    
+                    switch (action) {
+                        case 'edit':
+                            editRule(index);
+                            break;
+                        case 'test':
+                            testRule(index);
+                            break;
+                        case 'delete':
+                            deleteRule(index);
+                            break;
+                    }
+                });
+            });
+        }
+
+        function updateStats() {
+            const stats = {
+                total: rules.length,
+                enabled: rules.filter(r => r.enabled).length,
+                disabled: rules.filter(r => !r.enabled).length,
+                builtin: rules.filter(r => r.type === 'builtin').length,
+                custom: rules.filter(r => r.type !== 'builtin').length
+            };
+            
+            document.getElementById('ruleStats').innerHTML = `
+                <div class="stat-card">
+                    <div class="stat-number">${stats.total}</div>
+                    <div class="stat-label">Total Rules</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number">${stats.enabled}</div>
+                    <div class="stat-label">Enabled</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number">${stats.disabled}</div>
+                    <div class="stat-label">Disabled</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number">${stats.builtin}</div>
+                    <div class="stat-label">Built-in</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number">${stats.custom}</div>
+                    <div class="stat-label">Custom</div>
+                </div>
+            `;
+        }
+
+        function filterRules() {
+            const categoryFilter = document.getElementById('categoryFilter').value;
+            const typeFilter = document.getElementById('typeFilter').value;
+            const searchFilter = document.getElementById('searchFilter').value.toLowerCase();
+            
+            let filtered = rules;
+            
+            if (categoryFilter) {
+                filtered = filtered.filter(rule => rule.category === categoryFilter);
+            }
+            
+            if (typeFilter) {
+                filtered = filtered.filter(rule => rule.type === typeFilter);
+            }
+            
+            if (searchFilter) {
+                filtered = filtered.filter(rule => 
+                    (rule.name && rule.name.toLowerCase().includes(searchFilter)) ||
+                    rule.pattern.toLowerCase().includes(searchFilter) ||
+                    (rule.description && rule.description.toLowerCase().includes(searchFilter))
+                );
+            }
+            
+            displayRules(filtered);
+        }
+
+        function toggleRule(index) {
+            rules[index].enabled = !rules[index].enabled;
+            storage.updateRule(index, rules[index]);
+            updateStats();
+        }
+
+        function editRule(index) {
+            editingRuleIndex = index;
+            const rule = rules[index];
+            
+            document.getElementById('modalTitle').textContent = 'Edit Rule';
+            document.getElementById('ruleName').value = rule.name || '';
+            document.getElementById('ruleType').value = rule.type;
+            document.getElementById('rulePattern').value = rule.pattern;
+            document.getElementById('ruleCategory').value = rule.category;
+            document.getElementById('ruleReplacement').value = rule.replacement || '';
+            document.getElementById('ruleDescription').value = rule.description || '';
+            document.getElementById('ruleEnabled').checked = rule.enabled;
+            
+            updatePatternField();
+            document.getElementById('ruleModal').style.display = 'block';
+        }
+
+        function deleteRule(index) {
+            const rule = rules[index];
+            if (confirm(`Are you sure you want to delete the rule "${rule.name || rule.pattern}"?`)) {
+                storage.deleteRule(index);
+                loadRules();
+            }
+        }
+
+        function testRule(index) {
+            const rule = rules[index];
+            const testText = prompt(`Enter test text to check against rule "${rule.name || rule.pattern}":`);
+            
+            if (testText) {
+                try {
+                    const engine = new BulletproofSanitizerEngine();
+                    const detections = engine.detectSafe(testText, { rules: [rule] });
+                    const sanitized = engine.sanitize(testText, { rules: [rule] });
+                    
+                    alert(`Test Results:\n\nOriginal: ${testText}\nDetections: ${detections.length}\nSanitized: ${sanitized}\nChanged: ${testText !== sanitized ? 'Yes' : 'No'}`);
+                } catch (error) {
+                    alert(`Test Error: ${error.message}`);
+                }
+            }
+        }
+
+        function showAddRuleModal() {
+            editingRuleIndex = -1;
+            document.getElementById('modalTitle').textContent = 'Add New Rule';
+            document.getElementById('ruleForm').reset();
+            document.getElementById('ruleEnabled').checked = true;
+            updatePatternField();
+            document.getElementById('ruleModal').style.display = 'block';
+        }
+
+        function closeModal() {
+            document.getElementById('ruleModal').style.display = 'none';
+        }
+
+        function updatePatternField() {
+            const type = document.getElementById('ruleType').value;
+            const patternField = document.getElementById('rulePattern');
+            const helpText = document.getElementById('patternHelp');
+            
+            switch (type) {
+                case 'literal':
+                    patternField.placeholder = 'Enter exact text to match';
+                    helpText.textContent = 'Enter the exact text to detect (case-insensitive)';
+                    break;
+                case 'regex':
+                    patternField.placeholder = '\\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\\.[A-Z|a-z]{2,}\\b';
+                    helpText.textContent = 'Enter a regular expression pattern';
+                    break;
+                case 'builtin':
+                    patternField.placeholder = 'email, phone, ssn, credit_card, etc.';
+                    helpText.textContent = 'Enter a built-in pattern name (email, phone, ssn, etc.)';
+                    break;
+                case 'kv':
+                    patternField.placeholder = 'password, api_key, secret, etc.';
+                    helpText.textContent = 'Enter the key name to detect in key-value pairs';
+                    break;
+            }
+        }
+
+        function saveRule(event) {
+            event.preventDefault();
+            
+            const rule = {
+                name: document.getElementById('ruleName').value,
+                type: document.getElementById('ruleType').value,
+                pattern: document.getElementById('rulePattern').value,
+                category: document.getElementById('ruleCategory').value,
+                replacement: document.getElementById('ruleReplacement').value || null,
+                description: document.getElementById('ruleDescription').value,
+                enabled: document.getElementById('ruleEnabled').checked
+            };
+            
+            try {
+                if (editingRuleIndex >= 0) {
+                    rule.id = rules[editingRuleIndex].id;
+                    storage.updateRule(editingRuleIndex, rule);
+                } else {
+                    storage.addRule(rule);
+                }
+                
+                loadRules();
+                closeModal();
+                alert('Rule saved successfully!');
+            } catch (error) {
+                alert('Error saving rule: ' + error.message);
+            }
+        }
+
+        function resetToDefaults() {
+            if (confirm('Are you sure you want to reset all rules to defaults? This will delete all custom rules.')) {
+                storage.resetToDefaults();
+                loadRules();
+                alert('Rules reset to defaults successfully!');
+            }
+        }
+
+        function exportRules() {
+            const data = {
+                rules: rules,
+                exportDate: new Date(),
+                version: '1.0.0'
+            };
+            
+            const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'sanitizer-rules.json';
+            a.click();
+            URL.revokeObjectURL(url);
+        }
+
+        function importRules() {
+            const input = document.createElement('input');
+            input.type = 'file';
+            input.accept = '.json';
+            input.onchange = function(event) {
+                const file = event.target.files[0];
+                if (file) {
+                    const reader = new FileReader();
+                    reader.onload = function(e) {
+                        try {
+                            const data = JSON.parse(e.target.result);
+                            if (data.rules && Array.isArray(data.rules)) {
+                                if (confirm(`Import ${data.rules.length} rules? This will replace all current rules.`)) {
+                                    storage.setItem(storage.keys.rules, data.rules);
+                                    loadRules();
+                                    alert('Rules imported successfully!');
+                                }
+                            } else {
+                                alert('Invalid rules file format');
+                            }
+                        } catch (error) {
+                            alert('Error importing rules: ' + error.message);
+                        }
+                    };
+                    reader.readAsText(file);
+                }
+            };
+            input.click();
+        }
+
+        // Close modal when clicking outside
+        window.onclick = function(event) {
+            const modal = document.getElementById('ruleModal');
+            if (event.target === modal) {
+                closeModal();
+            }
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,63 @@
+{
+  "name": "aisanitizr",
+  "version": "2.0.0",
+  "description": "AISanitizr - Enterprise-grade data sanitization for AI workflows",
+  "main": "src/sanitizer-engine-bulletproof.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node server.js --dev",
+    "test": "node test/test-runner.js",
+    "test:comprehensive": "node test/test-comprehensive.js",
+    "test:coverage": "node test/test-coverage.js",
+    "build": "node scripts/build.js",
+    "lint": "eslint src/ --fix",
+    "serve": "http-server . -p 3000 -o",
+    "install-deps": "npm install"
+  },
+  "keywords": [
+    "data-sanitization",
+    "privacy",
+    "security",
+    "pii-detection",
+    "sensitive-data",
+    "client-side",
+    "bulletproof",
+    "enterprise",
+    "modern-ui",
+    "aisanitizr",
+    "ai-safety"
+  ],
+  "author": "Data Sanitizer Team",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/your-org/data-sanitizer-bulletproof.git"
+  },
+  "bugs": {
+    "url": "https://github.com/your-org/data-sanitizer-bulletproof/issues"
+  },
+  "homepage": "https://github.com/your-org/data-sanitizer-bulletproof#readme",
+  "dependencies": {
+    "express": "^4.18.2",
+    "cors": "^2.8.5",
+    "helmet": "^7.1.0",
+    "compression": "^1.7.4"
+  },
+  "devDependencies": {
+    "http-server": "^14.1.1",
+    "eslint": "^8.55.0",
+    "nodemon": "^3.0.2",
+    "concurrently": "^8.2.2"
+  },
+  "engines": {
+    "node": ">=14.0.0",
+    "npm": ">=6.0.0"
+  },
+  "files": [
+    "src/",
+    "public/",
+    "test/",
+    "README.md",
+    "LICENSE"
+  ]
+}

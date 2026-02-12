@@ -1,0 +1,579 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Custom Sensitive Words Settings</title>
+    <style>
+        body { 
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; 
+            padding: 20px; 
+            background: #f8f9fa; 
+            margin: 0;
+        }
+        .container { max-width: 800px; margin: 0 auto; }
+        .card { 
+            background: white; 
+            padding: 24px; 
+            margin: 20px 0; 
+            border-radius: 12px; 
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1); 
+            border: 1px solid #e9ecef;
+        }
+        .header { 
+            text-align: center; 
+            padding: 20px 0; 
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border-radius: 12px;
+            margin-bottom: 20px;
+        }
+        .header h1 { margin: 0; font-size: 28px; }
+        .header p { margin: 10px 0 0 0; opacity: 0.9; }
+        
+        .form-group { margin: 20px 0; }
+        .form-group label { 
+            display: block; 
+            margin-bottom: 8px; 
+            font-weight: 600; 
+            color: #495057;
+        }
+        .form-group input, .form-group select, .form-group textarea { 
+            width: 100%; 
+            padding: 12px; 
+            border: 2px solid #e9ecef; 
+            border-radius: 8px; 
+            font-size: 14px;
+            transition: border-color 0.2s;
+        }
+        .form-group input:focus, .form-group select:focus, .form-group textarea:focus { 
+            outline: none; 
+            border-color: #667eea; 
+        }
+        
+        .toggle-switch {
+            position: relative;
+            display: inline-block;
+            width: 60px;
+            height: 34px;
+        }
+        .toggle-switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+        .slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: #ccc;
+            transition: .4s;
+            border-radius: 34px;
+        }
+        .slider:before {
+            position: absolute;
+            content: "";
+            height: 26px;
+            width: 26px;
+            left: 4px;
+            bottom: 4px;
+            background-color: white;
+            transition: .4s;
+            border-radius: 50%;
+        }
+        input:checked + .slider {
+            background-color: #667eea;
+        }
+        input:checked + .slider:before {
+            transform: translateX(26px);
+        }
+        
+        .btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            margin: 5px;
+        }
+        .btn-primary { background: #667eea; color: white; }
+        .btn-primary:hover { background: #5a6fd8; }
+        .btn-secondary { background: #6c757d; color: white; }
+        .btn-secondary:hover { background: #5a6268; }
+        .btn-danger { background: #dc3545; color: white; }
+        .btn-danger:hover { background: #c82333; }
+        .btn-success { background: #28a745; color: white; }
+        .btn-success:hover { background: #218838; }
+        
+        .word-list {
+            background: #f8f9fa;
+            border-radius: 8px;
+            padding: 16px;
+            margin: 16px 0;
+            min-height: 100px;
+        }
+        .word-tag {
+            display: inline-block;
+            background: #667eea;
+            color: white;
+            padding: 6px 12px;
+            margin: 4px;
+            border-radius: 20px;
+            font-size: 12px;
+            position: relative;
+        }
+        .word-tag .remove {
+            margin-left: 8px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+        .word-tag .remove:hover {
+            color: #ffcccb;
+        }
+        
+        .add-word-form {
+            display: flex;
+            gap: 10px;
+            align-items: end;
+            margin: 16px 0;
+        }
+        .add-word-form input {
+            flex: 1;
+            margin: 0;
+        }
+        .add-word-form select {
+            width: 150px;
+            margin: 0;
+        }
+        
+        .preview-section {
+            background: #e9ecef;
+            padding: 16px;
+            border-radius: 8px;
+            margin: 16px 0;
+        }
+        .preview-text {
+            background: #1e1e1e;
+            color: #00ff00;
+            padding: 12px;
+            border-radius: 6px;
+            font-family: 'Courier New', monospace;
+            font-size: 12px;
+            white-space: pre-wrap;
+            margin: 8px 0;
+        }
+        
+        .info-box {
+            background: #d1ecf1;
+            border: 1px solid #bee5eb;
+            color: #0c5460;
+            padding: 12px;
+            border-radius: 6px;
+            margin: 16px 0;
+        }
+        .warning-box {
+            background: #fff3cd;
+            border: 1px solid #ffeaa7;
+            color: #856404;
+            padding: 12px;
+            border-radius: 6px;
+            margin: 16px 0;
+        }
+        
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 16px;
+            margin: 20px 0;
+        }
+        .stat-card {
+            background: #f8f9fa;
+            padding: 16px;
+            border-radius: 8px;
+            text-align: center;
+            border: 1px solid #e9ecef;
+        }
+        .stat-number {
+            font-size: 24px;
+            font-weight: bold;
+            color: #667eea;
+            margin-bottom: 4px;
+        }
+        .stat-label {
+            font-size: 12px;
+            color: #6c757d;
+            text-transform: uppercase;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🎯 Custom Sensitive Words</h1>
+            <p>Localize your data sanitizer with company-specific sensitive words</p>
+        </div>
+        
+        <!-- Enable/Disable Toggle -->
+        <div class="card">
+            <div class="form-group">
+                <label>
+                    <span style="margin-right: 16px;">Enable Custom Sensitive Words</span>
+                    <label class="toggle-switch">
+                        <input type="checkbox" id="enableCustomWords">
+                        <span class="slider"></span>
+                    </label>
+                </label>
+            </div>
+            
+            <div class="info-box">
+                <strong>💡 How it works:</strong> Add your company name, competitor names, project names, and other sensitive words. 
+                The sanitizer will automatically detect and replace these words in your data to prevent information leakage.
+            </div>
+        </div>
+        
+        <!-- Company Information -->
+        <div class="card" id="customWordsConfig" style="display: none;">
+            <h3>🏢 Company Information</h3>
+            
+            <div class="form-group">
+                <label for="companyName">Your Company Name</label>
+                <input type="text" id="companyName" placeholder="e.g., Microsoft, Google, Apple">
+            </div>
+            
+            <div class="form-group">
+                <label for="replacementStrategy">Replacement Strategy</label>
+                <select id="replacementStrategy">
+                    <option value="generic">Generic (CompanyName, ProjectName, etc.)</option>
+                    <option value="competitor">Use Competitor Names</option>
+                    <option value="custom">Pattern Preserving (Xxx, XXX, etc.)</option>
+                </select>
+            </div>
+        </div>
+        
+        <!-- Competitor Names -->
+        <div class="card" id="competitorSection" style="display: none;">
+            <h3>🏆 Competitor Names</h3>
+            <p>Add competitor names that can be used as replacements for your company name</p>
+            
+            <div class="add-word-form">
+                <input type="text" id="competitorInput" placeholder="Enter competitor name">
+                <button class="btn btn-primary" data-action="add-competitor">Add Competitor</button>
+            </div>
+            
+            <div class="word-list" id="competitorList">
+                <em>No competitors added yet</em>
+            </div>
+        </div>
+        
+        <!-- Project Names -->
+        <div class="card" id="projectSection" style="display: none;">
+            <h3>📁 Project Names</h3>
+            <p>Add internal project names, codenames, or product names that should be sanitized</p>
+            
+            <div class="add-word-form">
+                <input type="text" id="projectInput" placeholder="Enter project name">
+                <button class="btn btn-primary" data-action="add-project">Add Project</button>
+            </div>
+            
+            <div class="word-list" id="projectList">
+                <em>No projects added yet</em>
+            </div>
+        </div>
+        
+        <!-- Custom Words -->
+        <div class="card" id="customSection" style="display: none;">
+            <h3>🔤 Custom Sensitive Words</h3>
+            <p>Add any other sensitive words specific to your organization</p>
+            
+            <div class="add-word-form">
+                <input type="text" id="customInput" placeholder="Enter sensitive word">
+                <button class="btn btn-primary" data-action="add-custom">Add Word</button>
+            </div>
+            
+            <div class="word-list" id="customList">
+                <em>No custom words added yet</em>
+            </div>
+        </div>
+        
+        <!-- Statistics -->
+        <div class="card" id="statsSection" style="display: none;">
+            <h3>📊 Configuration Statistics</h3>
+            <div class="stats">
+                <div class="stat-card">
+                    <div class="stat-number" id="companyCount">0</div>
+                    <div class="stat-label">Company</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number" id="competitorCount">0</div>
+                    <div class="stat-label">Competitors</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number" id="projectCount">0</div>
+                    <div class="stat-label">Projects</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number" id="customCount">0</div>
+                    <div class="stat-label">Custom Words</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number" id="totalCount">0</div>
+                    <div class="stat-label">Total Rules</div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Live Preview -->
+        <div class="card" id="previewSection" style="display: none;">
+            <h3>🔍 Live Preview</h3>
+            <p>Test your custom words configuration with sample text</p>
+            
+            <div class="form-group">
+                <label for="previewInput">Sample Text</label>
+                <textarea id="previewInput" rows="4" placeholder="Enter text containing your sensitive words to see how they will be sanitized...">Welcome to Microsoft! Our latest project Azure is competing with Google Cloud and Amazon AWS. Contact john@microsoft.com for more details about our confidential initiative.</textarea>
+            </div>
+            
+            <button class="btn btn-primary" id="testSanitizationBtn">Test Sanitization</button>
+            
+            <div class="preview-section">
+                <h4>Original Text:</h4>
+                <div class="preview-text" id="originalPreview"></div>
+                
+                <h4>Sanitized Text:</h4>
+                <div class="preview-text" id="sanitizedPreview"></div>
+            </div>
+        </div>
+        
+        <!-- Actions -->
+        <div class="card">
+            <div style="text-align: center;">
+                <button class="btn btn-success" id="saveConfigBtn">💾 Save Configuration</button>
+                <button class="btn btn-secondary" id="loadConfigBtn">🔄 Reload</button>
+                <button class="btn btn-danger" id="resetConfigBtn">🗑️ Reset to Defaults</button>
+            </div>
+            
+            <div class="warning-box" style="margin-top: 16px;">
+                <strong>⚠️ Important:</strong> Custom sensitive words are stored locally in your browser. 
+                Make sure to backup your configuration if you want to preserve it across different devices or browsers.
+            </div>
+        </div>
+    </div>
+
+    <script src="storage.js"></script>
+    <script src="sanitizer-engine-bulletproof.js"></script>
+    <script>
+        const storage = window.storage;
+        const engine = new BulletproofSanitizerEngine();
+        let currentConfig = {};
+
+        // Initialize the page
+        document.addEventListener('DOMContentLoaded', function() {
+            loadConfiguration();
+            setupEventListeners();
+        });
+
+        function setupEventListeners() {
+            document.getElementById('enableCustomWords').addEventListener('change', toggleCustomWords);
+            document.getElementById('companyName').addEventListener('input', updateCompanyName);
+            document.getElementById('replacementStrategy').addEventListener('change', updateReplacementStrategy);
+            
+            // Action buttons
+            document.querySelectorAll('[data-action]').forEach(button => {
+                button.addEventListener('click', function() {
+                    const action = this.dataset.action;
+                    switch (action) {
+                        case 'add-competitor':
+                            addWord('competitor');
+                            break;
+                        case 'add-project':
+                            addWord('project');
+                            break;
+                        case 'add-custom':
+                            addWord('custom');
+                            break;
+                    }
+                });
+            });
+            
+            // Main buttons
+            document.getElementById('testSanitizationBtn').addEventListener('click', updatePreview);
+            document.getElementById('saveConfigBtn').addEventListener('click', saveConfiguration);
+            document.getElementById('loadConfigBtn').addEventListener('click', loadConfiguration);
+            document.getElementById('resetConfigBtn').addEventListener('click', resetConfiguration);
+            
+            // Enter key handlers for input fields
+            document.getElementById('competitorInput').addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') addWord('competitor');
+            });
+            document.getElementById('projectInput').addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') addWord('project');
+            });
+            document.getElementById('customInput').addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') addWord('custom');
+            });
+            
+            // Auto-update preview
+            document.getElementById('previewInput').addEventListener('input', updatePreview);
+        }
+
+        function loadConfiguration() {
+            currentConfig = storage.getCustomSensitiveWords();
+            
+            // Update UI elements
+            document.getElementById('enableCustomWords').checked = currentConfig.enabled;
+            document.getElementById('companyName').value = currentConfig.companyName || '';
+            document.getElementById('replacementStrategy').value = currentConfig.replacementStrategy || 'generic';
+            
+            toggleCustomWords();
+            updateWordLists();
+            updateStats();
+            updatePreview();
+        }
+
+        function toggleCustomWords() {
+            const enabled = document.getElementById('enableCustomWords').checked;
+            const sections = ['customWordsConfig', 'competitorSection', 'projectSection', 'customSection', 'statsSection', 'previewSection'];
+            
+            sections.forEach(sectionId => {
+                document.getElementById(sectionId).style.display = enabled ? 'block' : 'none';
+            });
+            
+            currentConfig.enabled = enabled;
+        }
+
+        function updateCompanyName() {
+            currentConfig.companyName = document.getElementById('companyName').value.trim();
+            updateStats();
+        }
+
+        function updateReplacementStrategy() {
+            currentConfig.replacementStrategy = document.getElementById('replacementStrategy').value;
+        }
+
+        function addWord(category) {
+            const inputId = category + 'Input';
+            const input = document.getElementById(inputId);
+            const word = input.value.trim();
+            
+            if (!word) {
+                alert('Please enter a word');
+                return;
+            }
+            
+            const success = storage.addCustomSensitiveWord(word, category);
+            if (success) {
+                input.value = '';
+                loadConfiguration(); // Reload to update UI
+            } else {
+                alert('Failed to add word');
+            }
+        }
+
+        function removeWord(word, category) {
+            if (confirm(`Remove "${word}" from ${category} list?`)) {
+                const success = storage.removeCustomSensitiveWord(word, category);
+                if (success) {
+                    loadConfiguration(); // Reload to update UI
+                }
+            }
+        }
+
+        function updateWordLists() {
+            updateWordList('competitorList', currentConfig.competitorNames || [], 'competitor');
+            updateWordList('projectList', currentConfig.projectNames || [], 'project');
+            updateWordList('customList', currentConfig.customWords || [], 'custom');
+        }
+
+        function updateWordList(listId, words, category) {
+            const listElement = document.getElementById(listId);
+            
+            if (words.length === 0) {
+                listElement.innerHTML = `<em>No ${category} words added yet</em>`;
+                return;
+            }
+            
+            listElement.innerHTML = words.map(word => 
+                `<span class="word-tag">
+                    ${word}
+                    <span class="remove" data-word="${word}" data-category="${category}">&times;</span>
+                </span>`
+            ).join('');
+            
+            // Add event listeners to remove buttons
+            listElement.querySelectorAll('.remove').forEach(button => {
+                button.addEventListener('click', function() {
+                    const word = this.dataset.word;
+                    const category = this.dataset.category;
+                    removeWord(word, category);
+                });
+            });
+        }
+
+        function updateStats() {
+            const companyCount = currentConfig.companyName ? 1 : 0;
+            const competitorCount = (currentConfig.competitorNames || []).length;
+            const projectCount = (currentConfig.projectNames || []).length;
+            const customCount = (currentConfig.customWords || []).length;
+            const totalCount = companyCount + competitorCount + projectCount + customCount;
+            
+            document.getElementById('companyCount').textContent = companyCount;
+            document.getElementById('competitorCount').textContent = competitorCount;
+            document.getElementById('projectCount').textContent = projectCount;
+            document.getElementById('customCount').textContent = customCount;
+            document.getElementById('totalCount').textContent = totalCount;
+        }
+
+        function updatePreview() {
+            const previewText = document.getElementById('previewInput').value;
+            document.getElementById('originalPreview').textContent = previewText;
+            
+            if (!previewText.trim()) {
+                document.getElementById('sanitizedPreview').textContent = '';
+                return;
+            }
+            
+            try {
+                // Get all rules including custom ones
+                const rules = storage.getRules();
+                const sanitized = engine.sanitize(previewText, { rules });
+                document.getElementById('sanitizedPreview').textContent = sanitized;
+            } catch (error) {
+                document.getElementById('sanitizedPreview').textContent = 'Error: ' + error.message;
+            }
+        }
+
+        function saveConfiguration() {
+            const success = storage.updateCustomSensitiveWords(currentConfig);
+            if (success) {
+                alert('✅ Configuration saved successfully!');
+            } else {
+                alert('❌ Failed to save configuration');
+            }
+        }
+
+        function resetConfiguration() {
+            if (confirm('Are you sure you want to reset all custom sensitive words? This cannot be undone.')) {
+                const defaultConfig = storage.getDefaultSettings().customSensitiveWords;
+                const success = storage.updateCustomSensitiveWords(defaultConfig);
+                if (success) {
+                    loadConfiguration();
+                    alert('✅ Configuration reset to defaults');
+                } else {
+                    alert('❌ Failed to reset configuration');
+                }
+            }
+        }
+
+        // Auto-save on changes
+        setInterval(() => {
+            if (currentConfig.enabled) {
+                storage.updateCustomSensitiveWords(currentConfig);
+            }
+        }, 5000); // Save every 5 seconds
+    </script>
+</body>
+</html>
