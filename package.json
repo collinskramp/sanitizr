@@ -9,7 +9,6 @@
     "test": "node test/test-runner.js",
     "test:comprehensive": "node test/test-comprehensive.js",
     "test:coverage": "node test/test-coverage.js",
-    "build": "node scripts/build.js",
     "lint": "eslint src/ --fix",
     "serve": "http-server . -p 3000 -o",
     "install-deps": "npm install"
