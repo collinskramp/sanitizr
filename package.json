@@ -6,6 +6,7 @@
   "scripts": {
     "start": "node server.js",
     "dev": "node server.js --dev",
+    "build": "echo 'Static site - no build needed'",
     "test": "node test/test-runner.js",
     "test:comprehensive": "node test/test-comprehensive.js",
     "test:coverage": "node test/test-coverage.js",
