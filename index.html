@@ -32,6 +32,9 @@
             /* Code highlighting */
             --code-bg: #1e1e1e;
             --code-text: #d4d4d4;
+            
+            /* UI customization */
+            --ui-radius: 8px;
         }
 
         [data-theme="dark"] {
@@ -135,14 +138,16 @@
         /* Tabs */
         .tabs-bar {
             display: flex; align-items: center; background: var(--bg-secondary);
-            border-bottom: 1px solid var(--border-color); padding: 0 12px; gap: 4px; min-height: 38px;
+            border-bottom: 1px solid var(--border-color); padding: 0 16px; gap: 6px; min-height: 48px;
         }
 
         .tab {
-            display: flex; align-items: center; gap: 8px; padding: 8px 12px;
-            background: transparent; border: none; font-size: 13px; color: var(--text-secondary);
-            cursor: pointer; border-radius: 6px 6px 0 0; position: relative; max-width: 180px;
+            display: flex; align-items: center; gap: 10px; padding: 12px 18px;
+            background: transparent; border: none; font-size: 14px; color: var(--text-secondary);
+            cursor: pointer; border-radius: 8px 8px 0 0; position: relative; max-width: 200px;
+            font-weight: 500; transition: all 0.15s ease;
         }
+        .tab:hover { background: var(--bg-tertiary); }
 
         .tab.active {
             background: var(--bg-primary); color: var(--text-primary);
@@ -150,6 +155,8 @@
         }
 
         .tab-title { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+        .tab-icon { display: flex; align-items: center; color: var(--text-muted); }
+        .tab-icon svg { width: 14px; height: 14px; }
 
         .tab-close {
             display: flex; align-items: center; justify-content: center;
@@ -188,21 +195,21 @@
             100% { opacity: 0; transform: translateY(-100%); }
         }
 
-        /* Status Banner */
+        /* Status Banner - Compact */
         .status-banner {
-            display: none; padding: 12px 20px; background: var(--success-bg);
+            display: none; padding: 8px 20px; background: var(--success-bg);
             border-bottom: 1px solid var(--success-border);
         }
-        .status-banner.show { display: flex; align-items: center; justify-content: space-between; }
-        .status-banner-left { display: flex; align-items: center; gap: 12px; }
+        .status-banner.show { display: flex; align-items: center; gap: 12px; }
         .status-icon {
-            width: 24px; height: 24px; background: var(--success-text);
-            border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white;
+            width: 20px; height: 20px; background: var(--success-text);
+            border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; flex-shrink: 0;
         }
-        .status-icon svg { width: 14px; height: 14px; }
-        .status-text h4 { font-size: 14px; font-weight: 600; color: var(--success-text); }
+        .status-icon svg { width: 12px; height: 12px; }
+        .status-text { display: flex; align-items: center; gap: 8px; flex: 1; }
+        .status-text h4 { font-size: 13px; font-weight: 600; color: var(--success-text); white-space: nowrap; }
         .status-text p { font-size: 12px; color: var(--text-secondary); }
-        .status-actions { display: flex; gap: 8px; }
+        .status-actions { display: flex; gap: 8px; margin-left: auto; }
 
         /* Container */
         .container { max-width: 1400px; margin: 0 auto; padding: 24px 20px; }
@@ -213,7 +220,7 @@
             display: inline-flex; align-items: center; gap: 6px;
             background: var(--bg-primary); color: var(--text-secondary);
             border: 1px solid var(--border-color); padding: 7px 12px;
-            font-size: 12px; font-weight: 500; border-radius: 6px;
+            font-size: 12px; font-weight: 500; border-radius: var(--ui-radius);
             cursor: pointer; font-family: inherit; transition: all 0.15s ease;
         }
         .quick-btn:hover { background: var(--bg-tertiary); border-color: var(--text-muted); color: var(--text-primary); }
@@ -224,7 +231,7 @@
         /* Detection Summary - Collapsible */
         .detection-summary {
             background: var(--bg-secondary); border: 1px solid var(--border-color);
-            border-radius: 8px; margin-bottom: 16px; overflow: hidden;
+            border-radius: var(--ui-radius); margin-bottom: 16px; overflow: hidden;
         }
         .detection-header {
             display: flex; justify-content: space-between; align-items: center;
@@ -251,14 +258,23 @@
 
         /* Panel */
         .panel {
-            border: 1px solid var(--border-color); border-radius: 8px;
+            border: 1px solid var(--border-color); border-radius: var(--ui-radius);
             background: var(--bg-primary); display: flex; flex-direction: column; overflow: hidden;
         }
         .panel-header {
+            display: flex; justify-content: space-between; align-items: center;
             padding: 10px 14px; border-bottom: 1px solid var(--border-color);
             background: var(--bg-secondary); font-size: 12px; font-weight: 500;
             color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.5px;
         }
+        .panel-header-actions { display: flex; gap: 4px; }
+        .panel-header-btn {
+            display: flex; align-items: center; justify-content: center;
+            width: 24px; height: 24px; border: none; background: transparent;
+            color: var(--text-muted); border-radius: 4px; cursor: pointer; transition: all 0.15s ease;
+        }
+        .panel-header-btn:hover { background: var(--bg-tertiary); color: var(--text-primary); }
+        .panel-header-btn svg { width: 14px; height: 14px; }
         .panel-content { padding: 0; flex: 1; min-height: 400px; position: relative; }
 
         textarea {
@@ -284,17 +300,27 @@
         .hidden-input { display: none; }
 
         /* Action Area */
-        .action-area { display: flex; justify-content: center; gap: 12px; margin-bottom: 16px; }
+        .action-area { display: flex; flex-direction: column; align-items: center; gap: 16px; margin-bottom: 16px; }
+        .burn-center-btn {
+            display: flex; align-items: center; justify-content: center; gap: 8px;
+            width: 56px; height: 56px; border-radius: 50%;
+            background: linear-gradient(135deg, #ff6b35, #f72585);
+            border: none; color: white; cursor: pointer; transition: all 0.2s ease;
+            box-shadow: 0 4px 15px rgba(247, 37, 133, 0.3);
+        }
+        .burn-center-btn:hover { transform: scale(1.1); box-shadow: 0 6px 25px rgba(247, 37, 133, 0.5); }
+        .burn-center-btn svg { width: 24px; height: 24px; }
+        .action-buttons { display: flex; gap: 12px; }
         .primary-btn {
             background: var(--accent-600); color: white; border: none;
             padding: 10px 28px; font-size: 14px; font-weight: 500;
-            border-radius: 6px; cursor: pointer; font-family: inherit; transition: all 0.15s ease;
+            border-radius: var(--ui-radius); cursor: pointer; font-family: inherit; transition: all 0.15s ease;
         }
         .primary-btn:hover { background: var(--accent-700); }
         .secondary-btn {
             background: var(--bg-primary); color: var(--text-primary);
             border: 1px solid var(--border-color); padding: 8px 16px;
-            font-size: 13px; font-weight: 500; border-radius: 6px;
+            font-size: 13px; font-weight: 500; border-radius: var(--ui-radius);
             cursor: pointer; font-family: inherit; transition: all 0.15s ease;
         }
         .secondary-btn:hover { background: var(--bg-tertiary); }
@@ -321,7 +347,8 @@
         .theme-modal.show { display: flex; }
         .theme-modal-content {
             background: var(--bg-primary); border-radius: 12px; padding: 24px;
-            width: 360px; max-width: 90vw; box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            width: 420px; max-width: 90vw; max-height: 90vh; overflow-y: auto;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
         }
         .theme-modal h3 { font-size: 16px; font-weight: 600; margin-bottom: 20px; color: var(--text-primary); }
         .theme-section { margin-bottom: 20px; }
@@ -351,6 +378,32 @@
         .color-swatch[data-color="orange"] { background: #ea580c; }
         .color-swatch[data-color="pink"] { background: #db2777; }
         .color-swatch[data-color="teal"] { background: #0d9488; }
+        .ui-style-options { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
+        .ui-style-option {
+            padding: 10px 8px; border: 2px solid var(--border-color);
+            border-radius: 8px; cursor: pointer; text-align: center; transition: all 0.15s ease;
+            font-size: 11px; color: var(--text-secondary);
+        }
+        .ui-style-option:hover { border-color: var(--accent-500); }
+        .ui-style-option.active { border-color: var(--accent-600); background: var(--bg-tertiary); }
+        .custom-words-section { margin-top: 16px; padding-top: 16px; border-top: 1px solid var(--border-color); }
+        .custom-input-group { margin-bottom: 12px; }
+        .custom-input-label { font-size: 12px; color: var(--text-secondary); margin-bottom: 4px; display: block; }
+        .custom-input {
+            width: 100%; padding: 8px 12px; border: 1px solid var(--border-color);
+            border-radius: 6px; font-size: 13px; background: var(--bg-primary);
+            color: var(--text-primary); outline: none; transition: border-color 0.15s ease;
+        }
+        .custom-input:focus { border-color: var(--accent-500); }
+        .custom-input::placeholder { color: var(--text-muted); }
+        .word-tags { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 8px; }
+        .word-tag {
+            display: inline-flex; align-items: center; gap: 4px;
+            padding: 4px 8px; background: var(--bg-tertiary);
+            border-radius: 12px; font-size: 11px; color: var(--text-secondary);
+        }
+        .word-tag-remove { cursor: pointer; opacity: 0.6; }
+        .word-tag-remove:hover { opacity: 1; }
         .modal-close { width: 100%; margin-top: 8px; }
 
         @media (max-width: 900px) {
@@ -366,7 +419,7 @@
     <!-- Theme Modal -->
     <div class="theme-modal" id="theme-modal">
         <div class="theme-modal-content">
-            <h3>Appearance</h3>
+            <h3>Appearance & Settings</h3>
             <div class="theme-section">
                 <div class="theme-section-title">Mode</div>
                 <div class="theme-options">
@@ -391,7 +444,39 @@
                     <div class="color-swatch" data-color="teal" title="Teal"></div>
                 </div>
             </div>
-            <button class="secondary-btn modal-close" id="close-theme-modal">Done</button>
+            <div class="theme-section">
+                <div class="theme-section-title">UI Style</div>
+                <div class="ui-style-options">
+                    <div class="ui-style-option" data-radius="sharp">Sharp</div>
+                    <div class="ui-style-option active" data-radius="rounded">Rounded</div>
+                    <div class="ui-style-option" data-radius="pill">Pill</div>
+                </div>
+            </div>
+            <div class="theme-section">
+                <div class="theme-section-title">Font Size</div>
+                <div class="ui-style-options">
+                    <div class="ui-style-option" data-fontsize="small">Small</div>
+                    <div class="ui-style-option active" data-fontsize="medium">Medium</div>
+                    <div class="ui-style-option" data-fontsize="large">Large</div>
+                </div>
+            </div>
+            <div class="custom-words-section">
+                <div class="theme-section-title">Custom Sanitization</div>
+                <div class="custom-input-group">
+                    <label class="custom-input-label">Company Name (will be replaced)</label>
+                    <input type="text" class="custom-input" id="company-name-input" placeholder="e.g., Acme Corp">
+                </div>
+                <div class="custom-input-group">
+                    <label class="custom-input-label">Replace with</label>
+                    <input type="text" class="custom-input" id="company-replacement-input" placeholder="e.g., [COMPANY] or Generic Corp">
+                </div>
+                <div class="custom-input-group">
+                    <label class="custom-input-label">Additional sensitive words (press Enter to add)</label>
+                    <input type="text" class="custom-input" id="custom-word-input" placeholder="Type and press Enter...">
+                    <div class="word-tags" id="word-tags"></div>
+                </div>
+            </div>
+            <button class="secondary-btn modal-close" id="close-theme-modal">Save & Close</button>
         </div>
     </div>
 
@@ -423,12 +508,12 @@
                     <path stroke-linecap="round" stroke-linejoin="round" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z" />
                 </svg>
             </button>
-            <button class="icon-btn" onclick="window.open('settings.html', '_blank')" title="Settings">
+            <a href="settings.html" class="icon-btn" title="Settings">
                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                     <path stroke-linecap="round" stroke-linejoin="round" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
                     <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
                 </svg>
-            </button>
+            </a>
         </div>
     </div>
 
@@ -437,16 +522,14 @@
 
     <!-- Status Banner -->
     <div class="status-banner" id="status-banner">
-        <div class="status-banner-left">
-            <div class="status-icon">
-                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="3">
-                    <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
-                </svg>
-            </div>
-            <div class="status-text">
-                <h4>Your data is safe to share</h4>
-                <p id="status-subtitle">5 sensitive items were removed or masked.</p>
-            </div>
+        <div class="status-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="3">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
+            </svg>
+        </div>
+        <div class="status-text">
+            <h4>Safe to share</h4>
+            <p id="status-subtitle">• 5 items masked</p>
         </div>
         <div class="status-actions">
             <button class="secondary-btn" id="copy-btn">Copy</button>
@@ -458,6 +541,18 @@
     <!-- Main Container -->
     <div class="container">
         <div class="quick-actions">
+            <button class="quick-btn" id="new-tab-quick-btn" title="Open new tab">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4" />
+                </svg>
+                New Tab
+            </button>
+            <button class="quick-btn" id="paste-btn" title="Paste from clipboard">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
+                </svg>
+                Paste
+            </button>
             <button class="quick-btn" id="load-example-btn" title="Load sample data">
                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                     <path stroke-linecap="round" stroke-linejoin="round" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
@@ -503,13 +598,24 @@
 
         <div class="grid">
             <div class="panel">
-                <div class="panel-header">Input</div>
+                <div class="panel-header">
+                    <span>Input</span>
+                </div>
                 <div class="panel-content">
                     <textarea id="input" placeholder="Paste text or drop files here..."></textarea>
                 </div>
             </div>
             <div class="panel">
-                <div class="panel-header">Sanitized Output</div>
+                <div class="panel-header">
+                    <span>Sanitized Output</span>
+                    <div class="panel-header-actions">
+                        <button class="panel-header-btn" id="copy-output-btn" title="Copy to clipboard">
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
+                            </svg>
+                        </button>
+                    </div>
+                </div>
                 <div class="panel-content">
                     <div class="code-output" id="output"><span style="color: var(--text-muted);">Sanitized content appears here</span></div>
                 </div>
@@ -517,7 +623,14 @@
         </div>
 
         <div class="action-area">
-            <button class="primary-btn" id="sanitize-btn">Sanitize Data</button>
+            <button class="burn-center-btn" id="burn-center-btn" title="Burn & Clear All">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M17.657 18.657A8 8 0 016.343 7.343S7 9 9 10c-2 1-4 .5-5 0a8 8 0 1013.657 8.657z" />
+                </svg>
+            </button>
+            <div class="action-buttons">
+                <button class="primary-btn" id="sanitize-btn">Sanitize Data</button>
+            </div>
         </div>
     </div>
 
@@ -546,6 +659,8 @@
             detectionHeader: document.getElementById('detection-header'),
             statusBanner: document.getElementById('status-banner'),
             statusSubtitle: document.getElementById('status-subtitle'),
+            newTabQuickBtn: document.getElementById('new-tab-quick-btn'),
+            pasteBtn: document.getElementById('paste-btn'),
             loadExampleBtn: document.getElementById('load-example-btn'),
             uploadBtn: document.getElementById('upload-btn'),
             fileInput: document.getElementById('file-input'),
@@ -556,29 +671,111 @@
             themeModal: document.getElementById('theme-modal'),
             closeThemeModal: document.getElementById('close-theme-modal'),
             tabsBar: document.getElementById('tabs-bar'),
-            fireOverlay: document.getElementById('fire-overlay')
+            fireOverlay: document.getElementById('fire-overlay'),
+            copyOutputBtn: document.getElementById('copy-output-btn'),
+            burnCenterBtn: document.getElementById('burn-center-btn'),
+            companyNameInput: document.getElementById('company-name-input'),
+            companyReplacementInput: document.getElementById('company-replacement-input'),
+            customWordInput: document.getElementById('custom-word-input'),
+            wordTags: document.getElementById('word-tags')
         };
         
         let debounceTimer;
+        let customWords = [];
+
+        // Load custom words from storage
+        function loadCustomSettings() {
+            const settings = storage.getSettings();
+            if (settings && settings.customSensitiveWords) {
+                elements.companyNameInput.value = settings.customSensitiveWords.companyName || '';
+                elements.companyReplacementInput.value = settings.customSensitiveWords.replacement || '';
+                customWords = settings.customSensitiveWords.customWords || [];
+                renderWordTags();
+            }
+        }
+
+        // Save custom words to storage
+        function saveCustomSettings() {
+            const settings = storage.getSettings();
+            settings.customSensitiveWords = {
+                companyName: elements.companyNameInput.value.trim(),
+                replacement: elements.companyReplacementInput.value.trim() || '[COMPANY]',
+                customWords: customWords
+            };
+            storage.saveSettings(settings);
+            // Refresh rules
+            currentRules = storage.getRules();
+        }
+
+        function renderWordTags() {
+            elements.wordTags.innerHTML = customWords.map((word, i) => `
+                <span class="word-tag">
+                    ${word}
+                    <span class="word-tag-remove" data-index="${i}">✕</span>
+                </span>
+            `).join('');
+            
+            document.querySelectorAll('.word-tag-remove').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    customWords.splice(parseInt(btn.dataset.index), 1);
+                    renderWordTags();
+                    saveCustomSettings();
+                });
+            });
+        }
+
+        elements.customWordInput.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter' && e.target.value.trim()) {
+                customWords.push(e.target.value.trim());
+                e.target.value = '';
+                renderWordTags();
+                saveCustomSettings();
+            }
+        });
+
+        elements.companyNameInput.addEventListener('change', saveCustomSettings);
+        elements.companyReplacementInput.addEventListener('change', saveCustomSettings);
 
         // Theme Management
         function loadThemePreferences() {
             const savedTheme = localStorage.getItem('aisanitizr-theme') || 'light';
             const savedAccent = localStorage.getItem('aisanitizr-accent') || 'blue';
+            const savedRadius = localStorage.getItem('aisanitizr-radius') || 'rounded';
+            const savedFontSize = localStorage.getItem('aisanitizr-fontsize') || 'medium';
             document.documentElement.setAttribute('data-theme', savedTheme);
             document.documentElement.setAttribute('data-accent', savedAccent);
+            document.documentElement.setAttribute('data-radius', savedRadius);
+            document.documentElement.setAttribute('data-fontsize', savedFontSize);
             updateThemeUI();
+            loadCustomSettings();
         }
 
         function updateThemeUI() {
             const theme = document.documentElement.getAttribute('data-theme');
             const accent = document.documentElement.getAttribute('data-accent');
+            const radius = document.documentElement.getAttribute('data-radius') || 'rounded';
+            const fontSize = document.documentElement.getAttribute('data-fontsize') || 'medium';
+            
             document.querySelectorAll('.theme-option').forEach(opt => {
                 opt.classList.toggle('active', opt.dataset.themeMode === theme);
             });
             document.querySelectorAll('.color-swatch').forEach(swatch => {
                 swatch.classList.toggle('active', swatch.dataset.color === accent);
             });
+            document.querySelectorAll('.ui-style-option[data-radius]').forEach(opt => {
+                opt.classList.toggle('active', opt.dataset.radius === radius);
+            });
+            document.querySelectorAll('.ui-style-option[data-fontsize]').forEach(opt => {
+                opt.classList.toggle('active', opt.dataset.fontsize === fontSize);
+            });
+            
+            // Apply radius
+            const radiusMap = { sharp: '0px', rounded: '8px', pill: '20px' };
+            document.documentElement.style.setProperty('--ui-radius', radiusMap[radius] || '8px');
+            
+            // Apply font size
+            const fontMap = { small: '13px', medium: '15px', large: '17px' };
+            document.body.style.fontSize = fontMap[fontSize] || '15px';
         }
 
         elements.themeBtn.addEventListener('click', () => elements.themeModal.classList.add('show'));
@@ -603,6 +800,22 @@
             });
         });
 
+        document.querySelectorAll('.ui-style-option[data-radius]').forEach(opt => {
+            opt.addEventListener('click', () => {
+                document.documentElement.setAttribute('data-radius', opt.dataset.radius);
+                localStorage.setItem('aisanitizr-radius', opt.dataset.radius);
+                updateThemeUI();
+            });
+        });
+
+        document.querySelectorAll('.ui-style-option[data-fontsize]').forEach(opt => {
+            opt.addEventListener('click', () => {
+                document.documentElement.setAttribute('data-fontsize', opt.dataset.fontsize);
+                localStorage.setItem('aisanitizr-fontsize', opt.dataset.fontsize);
+                updateThemeUI();
+            });
+        });
+
         elements.darkmodeBtn.addEventListener('click', () => {
             const next = document.documentElement.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
             document.documentElement.setAttribute('data-theme', next);
@@ -613,10 +826,17 @@
         loadThemePreferences();
 
         // Tab Management
+        function getTabDisplay(tab) {
+            if (!tab.input || tab.input.trim() === '') {
+                return `<span class="tab-title">New</span>`;
+            }
+            return `<span class="tab-title">${tab.title}</span>`;
+        }
+
         function renderTabs() {
             elements.tabsBar.innerHTML = tabs.map(tab => `
                 <button class="tab ${tab.id === activeTabId ? 'active' : ''}" data-tab-id="${tab.id}">
-                    <span class="tab-title">${tab.title}</span>
+                    ${getTabDisplay(tab)}
                     <span class="tab-close" data-close-id="${tab.id}">
                         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                             <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
@@ -624,11 +844,6 @@
                     </span>
                 </button>
             `).join('') + `
-                <button class="new-tab-btn" id="new-tab-btn" title="New Tab">
-                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" width="16" height="16">
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4" />
-                    </svg>
-                </button>
                 <button class="burn-all-btn" id="burn-all-btn" title="Burn all tabs">
                     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                         <path stroke-linecap="round" stroke-linejoin="round" d="M17.657 18.657A8 8 0 016.343 7.343S7 9 9 10c-2 1-4 .5-5 0a8 8 0 1013.657 8.657z" />
@@ -637,7 +852,6 @@
                 </button>
             `;
             
-            document.getElementById('new-tab-btn').addEventListener('click', createNewTab);
             document.getElementById('burn-all-btn').addEventListener('click', burnAllTabs);
             
             document.querySelectorAll('.tab').forEach(tab => {
@@ -710,6 +924,7 @@
             const tab = tabs.find(t => t.id === activeTabId);
             if (tab) {
                 const text = elements.input.value.trim();
+                tab.input = elements.input.value;
                 tab.title = text ? text.split('\n')[0].substring(0, 20) + (text.length > 20 ? '...' : '') : 'Untitled';
                 renderTabs();
             }
@@ -717,12 +932,44 @@
 
         elements.detectionHeader.addEventListener('click', () => elements.detectionSummary.classList.toggle('collapsed'));
         
+        // Copy output button on panel header
+        elements.copyOutputBtn.addEventListener('click', async () => {
+            const text = elements.output.innerText;
+            if (text && text !== 'Sanitized content appears here') {
+                await navigator.clipboard.writeText(text);
+                // Show feedback
+                const originalSvg = elements.copyOutputBtn.innerHTML;
+                elements.copyOutputBtn.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" /></svg>';
+                setTimeout(() => { elements.copyOutputBtn.innerHTML = originalSvg; }, 1500);
+            }
+        });
+
+        // Center burn button
+        elements.burnCenterBtn.addEventListener('click', burnAllTabs);
+        
         elements.input.addEventListener('paste', (e) => {
             if (elements.autoSanitize.checked) {
                 setTimeout(() => {
                     const text = elements.input.value.trim();
                     if (text) { detect(text); sanitize(text); updateTabTitle(); }
                 }, 10);
+            }
+        });
+        
+        elements.newTabQuickBtn.addEventListener('click', createNewTab);
+        
+        elements.pasteBtn.addEventListener('click', async () => {
+            try {
+                const text = await navigator.clipboard.readText();
+                if (text) {
+                    elements.input.value = text;
+                    handleInput();
+                    updateTabTitle();
+                    if (elements.autoSanitize.checked) sanitize(text.trim());
+                }
+            } catch (err) {
+                console.error('Failed to read clipboard:', err);
+                elements.input.focus();
             }
         });
         
@@ -811,9 +1058,31 @@ IP Address: 192.168.1.100`;
         
         function sanitize(text) {
             try {
-                const sanitized = sanitizer.sanitize(text, { rules: currentRules, deterministicReplacement: true });
+                let sanitized = sanitizer.sanitize(text, { rules: currentRules, deterministicReplacement: true });
+                
+                // Apply custom company name replacement
+                const settings = storage.getSettings();
+                if (settings && settings.customSensitiveWords) {
+                    const companyName = settings.customSensitiveWords.companyName;
+                    const replacement = settings.customSensitiveWords.replacement || '[COMPANY]';
+                    const words = settings.customSensitiveWords.customWords || [];
+                    
+                    if (companyName) {
+                        const regex = new RegExp(companyName.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'gi');
+                        sanitized = sanitized.replace(regex, replacement);
+                    }
+                    
+                    // Apply custom words
+                    words.forEach(word => {
+                        if (word) {
+                            const regex = new RegExp(word.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'gi');
+                            sanitized = sanitized.replace(regex, '[REDACTED]');
+                        }
+                    });
+                }
+                
                 elements.output.innerHTML = highlightRedacted(sanitized);
-                elements.statusSubtitle.textContent = `${currentDetections.length} sensitive ${currentDetections.length === 1 ? 'item was' : 'items were'} removed or masked.`;
+                elements.statusSubtitle.textContent = `• ${currentDetections.length} item${currentDetections.length === 1 ? '' : 's'} masked`;
                 elements.statusBanner.classList.add('show');
                 storage.addHistoryEntry({
                     timestamp: new Date(), originalText: text, sanitizedText: sanitized,

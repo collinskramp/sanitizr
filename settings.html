@@ -1,638 +1,1264 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-theme="light">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Settings - AISanitizr</title>
-    <link rel="stylesheet" href="modern-styles.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
-        body { 
-            font-family: 'Inter', var(--font-sans); 
-            background: linear-gradient(135deg, var(--gray-50) 0%, var(--primary-50) 100%);
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        
+        :root {
+            --bg-primary: #ffffff;
+            --bg-secondary: #f8fafc;
+            --bg-tertiary: #f1f5f9;
+            --border-color: #e2e8f0;
+            --text-primary: #0f172a;
+            --text-secondary: #475569;
+            --text-muted: #94a3b8;
+            --accent: #3b82f6;
+            --accent-light: #eff6ff;
+            --success: #10b981;
+            --success-light: #ecfdf5;
+            --warning: #f59e0b;
+            --warning-light: #fffbeb;
+            --danger: #ef4444;
+            --danger-light: #fef2f2;
+        }
+        
+        [data-theme="dark"] {
+            --bg-primary: #0f172a;
+            --bg-secondary: #1e293b;
+            --bg-tertiary: #334155;
+            --border-color: #475569;
+            --text-primary: #f8fafc;
+            --text-secondary: #cbd5e1;
+            --text-muted: #64748b;
+            --accent-light: #1e3a5f;
+            --success-light: #064e3b;
+            --warning-light: #78350f;
+            --danger-light: #7f1d1d;
+        }
+        
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: var(--bg-secondary);
+            color: var(--text-primary);
+            line-height: 1.6;
             min-height: 100vh;
-            margin: 0;
         }
         
-        .settings-container {
-            max-width: 900px;
-            margin: 0 auto;
-            padding: var(--space-8) var(--space-6);
-        }
-        
-        .settings-header {
-            text-align: center;
-            margin-bottom: var(--space-12);
-        }
-        
-        .settings-title {
-            font-size: 2.5rem;
-            font-weight: 700;
-            color: var(--gray-900);
-            margin-bottom: var(--space-4);
-        }
-        
-        .settings-subtitle {
-            font-size: 1.125rem;
-            color: var(--gray-600);
-            max-width: 600px;
-            margin: 0 auto;
-        }
-        
-        .settings-grid {
-            display: grid;
-            gap: var(--space-6);
-        }
-        
-        .setting-section {
-            background: rgba(255, 255, 255, 0.8);
-            backdrop-filter: blur(20px);
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            border-radius: var(--radius-2xl);
-            box-shadow: var(--shadow-xl);
-            padding: var(--space-8);
-            transition: all var(--transition-normal);
-        }
-        
-        .setting-section:hover {
-            box-shadow: 0 25px 50px -12px rgb(0 0 0 / 0.25);
-            transform: translateY(-2px);
-        }
-        
-        .section-header {
+        /* Header */
+        .header {
+            background: var(--bg-primary);
+            border-bottom: 1px solid var(--border-color);
+            padding: 16px 24px;
+            position: sticky;
+            top: 0;
+            z-index: 100;
             display: flex;
             align-items: center;
-            gap: var(--space-3);
-            margin-bottom: var(--space-6);
-            padding-bottom: var(--space-4);
-            border-bottom: 1px solid var(--gray-200);
+            justify-content: space-between;
         }
         
-        .section-icon {
-            width: 40px;
-            height: 40px;
-            background: linear-gradient(135deg, var(--primary-600), var(--primary-500));
-            border-radius: var(--radius-lg);
+        .header-left {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+        
+        .back-btn {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 16px;
+            background: var(--bg-tertiary);
+            border: none;
+            border-radius: 8px;
+            color: var(--text-primary);
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            text-decoration: none;
+            transition: all 0.15s ease;
+        }
+        .back-btn:hover { background: var(--border-color); }
+        .back-btn svg { width: 16px; height: 16px; }
+        
+        .header-title {
+            font-size: 20px;
+            font-weight: 600;
+        }
+        
+        .header-right {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        
+        .theme-toggle {
             display: flex;
             align-items: center;
             justify-content: center;
-            color: white;
-            font-size: 1.25rem;
+            width: 36px;
+            height: 36px;
+            background: var(--bg-tertiary);
+            border: none;
+            border-radius: 8px;
+            color: var(--text-secondary);
+            cursor: pointer;
+            transition: all 0.15s ease;
+        }
+        .theme-toggle:hover { background: var(--border-color); color: var(--text-primary); }
+        .theme-toggle svg { width: 18px; height: 18px; }
+        
+        /* Layout */
+        .layout {
+            display: flex;
+            max-width: 1200px;
+            margin: 0 auto;
+            min-height: calc(100vh - 65px);
+        }
+        
+        /* Sidebar */
+        .sidebar {
+            width: 240px;
+            padding: 24px 16px;
+            border-right: 1px solid var(--border-color);
+            background: var(--bg-primary);
+            position: sticky;
+            top: 65px;
+            height: calc(100vh - 65px);
+            overflow-y: auto;
+        }
+        
+        .nav-section {
+            margin-bottom: 24px;
+        }
+        
+        .nav-label {
+            font-size: 11px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            color: var(--text-muted);
+            padding: 0 12px;
+            margin-bottom: 8px;
+        }
+        
+        .nav-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 10px 12px;
+            border-radius: 8px;
+            color: var(--text-secondary);
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.15s ease;
+            border: none;
+            background: none;
+            width: 100%;
+            text-align: left;
+        }
+        .nav-item:hover { background: var(--bg-tertiary); color: var(--text-primary); }
+        .nav-item.active { background: var(--accent-light); color: var(--accent); }
+        .nav-item svg { width: 18px; height: 18px; flex-shrink: 0; }
+        
+        /* Main Content */
+        .main {
+            flex: 1;
+            padding: 32px;
+            overflow-y: auto;
+        }
+        
+        .section {
+            display: none;
+            animation: fadeIn 0.2s ease;
+        }
+        .section.active { display: block; }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(8px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .section-header {
+            margin-bottom: 24px;
         }
         
         .section-title {
-            font-size: 1.25rem;
+            font-size: 24px;
+            font-weight: 700;
+            margin-bottom: 8px;
+        }
+        
+        .section-desc {
+            font-size: 14px;
+            color: var(--text-secondary);
+        }
+        
+        /* Cards */
+        .card {
+            background: var(--bg-primary);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 24px;
+            margin-bottom: 16px;
+        }
+        
+        .card-title {
+            font-size: 16px;
             font-weight: 600;
-            color: var(--gray-900);
-            margin: 0;
+            margin-bottom: 16px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
         }
         
-        .section-description {
-            font-size: 0.875rem;
-            color: var(--gray-600);
-            margin-top: var(--space-1);
+        .card-title-icon {
+            width: 32px;
+            height: 32px;
+            background: var(--accent-light);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 16px;
         }
         
-        .setting-item {
+        /* Settings Row */
+        .setting-row {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding: var(--space-4) 0;
-            border-bottom: 1px solid var(--gray-100);
+            padding: 16px 0;
+            border-bottom: 1px solid var(--border-color);
         }
+        .setting-row:last-child { border-bottom: none; }
         
-        .setting-item:last-child {
-            border-bottom: none;
-        }
+        .setting-info { flex: 1; }
         
-        .setting-info {
-            flex: 1;
-        }
-        
-        .setting-name {
-            font-size: 0.875rem;
+        .setting-label {
+            font-size: 14px;
             font-weight: 500;
-            color: var(--gray-900);
-            margin-bottom: var(--space-1);
+            color: var(--text-primary);
+            margin-bottom: 4px;
         }
         
         .setting-desc {
-            font-size: 0.75rem;
-            color: var(--gray-600);
+            font-size: 13px;
+            color: var(--text-muted);
         }
         
-        .setting-control {
-            margin-left: var(--space-4);
+        .setting-control { margin-left: 24px; }
+        
+        /* Toggle Switch */
+        .toggle {
+            position: relative;
+            width: 44px;
+            height: 24px;
         }
         
-        .back-button {
-            position: fixed;
-            top: var(--space-6);
-            left: var(--space-6);
-            z-index: 100;
+        .toggle input {
+            opacity: 0;
+            width: 0;
+            height: 0;
         }
         
-        .storage-usage {
-            background: var(--gray-50);
-            padding: var(--space-4);
-            border-radius: var(--radius-lg);
-            margin: var(--space-4) 0;
+        .toggle-slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: var(--bg-tertiary);
+            border: 1px solid var(--border-color);
+            border-radius: 24px;
+            transition: all 0.2s ease;
         }
         
-        .usage-bar {
-            background: var(--gray-200);
-            height: 8px;
-            border-radius: var(--radius-md);
-            overflow: hidden;
-            margin: var(--space-2) 0;
+        .toggle-slider:before {
+            position: absolute;
+            content: "";
+            height: 18px;
+            width: 18px;
+            left: 2px;
+            bottom: 2px;
+            background: white;
+            border-radius: 50%;
+            transition: all 0.2s ease;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.2);
         }
         
-        .usage-fill {
-            height: 100%;
-            background: linear-gradient(90deg, var(--success-500), var(--success-400));
-            transition: width var(--transition-slow);
+        .toggle input:checked + .toggle-slider {
+            background: var(--accent);
+            border-color: var(--accent);
         }
         
-        .usage-fill.warning { 
-            background: linear-gradient(90deg, var(--warning-500), var(--warning-400)); 
+        .toggle input:checked + .toggle-slider:before {
+            transform: translateX(20px);
         }
         
-        .usage-fill.danger { 
-            background: linear-gradient(90deg, var(--error-500), var(--error-400)); 
+        /* Number Input */
+        .number-input {
+            width: 100px;
+            padding: 8px 12px;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            font-size: 14px;
+            font-family: inherit;
+            text-align: center;
+        }
+        .number-input:focus {
+            outline: none;
+            border-color: var(--accent);
+            box-shadow: 0 0 0 3px var(--accent-light);
         }
         
-        .theme-preview {
+        /* Theme Cards */
+        .theme-grid {
             display: grid;
             grid-template-columns: repeat(3, 1fr);
-            gap: var(--space-3);
-            margin: var(--space-4) 0;
+            gap: 12px;
+            margin-top: 16px;
         }
         
-        .theme-option {
-            padding: var(--space-4);
-            border: 2px solid var(--gray-200);
-            border-radius: var(--radius-lg);
-            cursor: pointer;
+        .theme-card {
+            padding: 20px;
+            border: 2px solid var(--border-color);
+            border-radius: 12px;
             text-align: center;
-            transition: all var(--transition-fast);
-            background: white;
+            cursor: pointer;
+            transition: all 0.15s ease;
+        }
+        .theme-card:hover { border-color: var(--accent); }
+        .theme-card.active { border-color: var(--accent); background: var(--accent-light); }
+        
+        .theme-card-icon {
+            font-size: 28px;
+            margin-bottom: 8px;
         }
         
-        .theme-option:hover {
-            border-color: var(--primary-300);
-            transform: translateY(-2px);
+        .theme-card-label {
+            font-size: 14px;
+            font-weight: 500;
         }
         
-        .theme-option.active {
-            border-color: var(--primary-500);
-            background: var(--primary-50);
+        /* Color Palette */
+        .color-grid {
+            display: flex;
+            gap: 12px;
+            margin-top: 16px;
         }
         
-        .theme-option.light {
-            background: white;
-            color: var(--gray-900);
+        .color-option {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            border: 3px solid transparent;
+            cursor: pointer;
+            transition: all 0.15s ease;
+            position: relative;
+        }
+        .color-option:hover { transform: scale(1.1); }
+        .color-option.active { border-color: var(--text-primary); }
+        .color-option.active::after {
+            content: "✓";
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            color: white;
+            font-weight: bold;
+            font-size: 14px;
         }
         
-        .theme-option.dark {
-            background: var(--gray-800);
+        .color-blue { background: #3b82f6; }
+        .color-purple { background: #a855f7; }
+        .color-green { background: #22c55e; }
+        .color-orange { background: #f97316; }
+        .color-pink { background: #ec4899; }
+        .color-teal { background: #14b8a6; }
+        
+        /* Storage */
+        .storage-bar-container {
+            margin: 16px 0;
+        }
+        
+        .storage-bar {
+            height: 8px;
+            background: var(--bg-tertiary);
+            border-radius: 4px;
+            overflow: hidden;
+        }
+        
+        .storage-bar-fill {
+            height: 100%;
+            background: var(--accent);
+            border-radius: 4px;
+            transition: width 0.3s ease;
+        }
+        .storage-bar-fill.warning { background: var(--warning); }
+        .storage-bar-fill.danger { background: var(--danger); }
+        
+        .storage-stats {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 8px;
+            font-size: 13px;
+            color: var(--text-muted);
+        }
+        
+        /* Buttons */
+        .btn-group {
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+            margin-top: 16px;
+        }
+        
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 500;
+            font-family: inherit;
+            cursor: pointer;
+            transition: all 0.15s ease;
+        }
+        .btn svg { width: 16px; height: 16px; }
+        
+        .btn-primary {
+            background: var(--accent);
             color: white;
         }
+        .btn-primary:hover { filter: brightness(1.1); }
         
-        .theme-option.system {
-            background: linear-gradient(45deg, white 50%, var(--gray-800) 50%);
-            color: var(--gray-900);
+        .btn-secondary {
+            background: var(--bg-tertiary);
+            color: var(--text-primary);
+        }
+        .btn-secondary:hover { background: var(--border-color); }
+        
+        .btn-success {
+            background: var(--success);
+            color: white;
+        }
+        .btn-success:hover { filter: brightness(1.1); }
+        
+        .btn-danger {
+            background: var(--danger);
+            color: white;
+        }
+        .btn-danger:hover { filter: brightness(1.1); }
+        
+        /* Alert */
+        .alert {
+            padding: 12px 16px;
+            border-radius: 8px;
+            font-size: 14px;
+            display: flex;
+            align-items: flex-start;
+            gap: 12px;
+            margin-bottom: 16px;
         }
         
-        .actions-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: var(--space-3);
-            margin-top: var(--space-6);
+        .alert-icon { font-size: 18px; flex-shrink: 0; }
+        
+        .alert-info {
+            background: var(--accent-light);
+            color: var(--accent);
+            border: 1px solid var(--accent);
         }
         
-        .status-message {
-            margin-top: var(--space-4);
-            padding: var(--space-3);
-            border-radius: var(--radius-lg);
+        .alert-warning {
+            background: var(--warning-light);
+            color: var(--warning);
+            border: 1px solid var(--warning);
+        }
+        
+        .alert-success {
+            background: var(--success-light);
+            color: var(--success);
+            border: 1px solid var(--success);
+        }
+        
+        .alert-danger {
+            background: var(--danger-light);
+            color: var(--danger);
+            border: 1px solid var(--danger);
+        }
+        
+        /* Toast */
+        .toast {
+            position: fixed;
+            bottom: 24px;
+            right: 24px;
+            padding: 14px 20px;
+            background: var(--text-primary);
+            color: var(--bg-primary);
+            border-radius: 10px;
+            font-size: 14px;
+            font-weight: 500;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+            transform: translateY(100px);
+            opacity: 0;
+            transition: all 0.3s ease;
+            z-index: 1000;
+        }
+        .toast.show { transform: translateY(0); opacity: 1; }
+        
+        /* Custom Words */
+        .word-tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-top: 12px;
+        }
+        
+        .word-tag {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 6px 12px;
+            background: var(--bg-tertiary);
+            border-radius: 20px;
+            font-size: 13px;
+        }
+        
+        .word-tag-remove {
+            width: 16px;
+            height: 16px;
+            border: none;
+            background: var(--text-muted);
+            color: white;
+            border-radius: 50%;
+            cursor: pointer;
+            font-size: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .word-tag-remove:hover { background: var(--danger); }
+        
+        .text-input {
+            width: 100%;
+            padding: 10px 14px;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            font-size: 14px;
+            font-family: inherit;
+        }
+        .text-input:focus {
+            outline: none;
+            border-color: var(--accent);
+            box-shadow: 0 0 0 3px var(--accent-light);
+        }
+        .text-input::placeholder { color: var(--text-muted); }
+        
+        .input-group {
+            margin-bottom: 16px;
+        }
+        
+        .input-label {
+            display: block;
+            font-size: 13px;
+            font-weight: 500;
+            color: var(--text-secondary);
+            margin-bottom: 6px;
+        }
+        
+        /* FAQ Accordion */
+        .faq-item {
+            border: 1px solid var(--border-color);
+            border-radius: 10px;
+            margin-bottom: 10px;
+            overflow: hidden;
+        }
+        
+        .faq-question {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            width: 100%;
+            padding: 16px;
+            background: var(--bg-secondary);
+            border: none;
+            text-align: left;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 500;
+            color: var(--text-primary);
+            font-family: inherit;
+            transition: background 0.15s ease;
+        }
+        .faq-question:hover { background: var(--bg-tertiary); }
+        
+        .faq-icon {
+            width: 20px;
+            height: 20px;
+            color: var(--text-muted);
+            transition: transform 0.2s ease;
+            flex-shrink: 0;
+        }
+        
+        .faq-item.open .faq-icon { transform: rotate(180deg); }
+        
+        .faq-answer {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.3s ease;
+        }
+        
+        .faq-item.open .faq-answer { max-height: 300px; }
+        
+        .faq-answer-content {
+            padding: 16px;
+            font-size: 14px;
+            color: var(--text-secondary);
+            line-height: 1.6;
+            border-top: 1px solid var(--border-color);
+        }
+        
+        /* Privacy Shield */
+        .privacy-shield {
+            background: linear-gradient(135deg, var(--success-light), var(--accent-light));
+            border: 1px solid var(--success);
+            border-radius: 12px;
+            padding: 24px;
+            margin-bottom: 16px;
             text-align: center;
-            font-size: 0.875rem;
         }
         
-        .status-success {
-            background: var(--success-50);
-            color: var(--success-700);
-            border: 1px solid var(--success-200);
+        .privacy-shield-icon {
+            font-size: 48px;
+            margin-bottom: 12px;
         }
         
-        .status-warning {
-            background: var(--warning-50);
-            color: var(--warning-700);
-            border: 1px solid var(--warning-200);
+        .privacy-shield-title {
+            font-size: 18px;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin-bottom: 8px;
         }
         
-        .status-error {
-            background: var(--error-50);
-            color: var(--error-700);
-            border: 1px solid var(--error-200);
+        .privacy-shield-text {
+            font-size: 14px;
+            color: var(--text-secondary);
+            max-width: 400px;
+            margin: 0 auto;
+        }
+        
+        .privacy-features {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 12px;
+            margin-top: 20px;
+        }
+        
+        .privacy-feature {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 12px;
+            background: var(--bg-primary);
+            border-radius: 8px;
+            font-size: 13px;
+            color: var(--text-primary);
+        }
+        
+        .privacy-feature-icon {
+            font-size: 18px;
+        }
+        
+        /* Mobile Responsive */
+        @media (max-width: 768px) {
+            .layout { flex-direction: column; }
+            .sidebar {
+                width: 100%;
+                height: auto;
+                position: static;
+                border-right: none;
+                border-bottom: 1px solid var(--border-color);
+                padding: 16px;
+            }
+            .nav-section { margin-bottom: 0; }
+            .nav-item { display: inline-flex; padding: 8px 12px; }
+            .main { padding: 20px; }
+            .theme-grid { grid-template-columns: 1fr; }
+            .privacy-features { grid-template-columns: 1fr; }
         }
     </style>
 </head>
 <body>
-    <!-- Back Button -->
-    <button class="btn btn-secondary back-button" onclick="window.close()">
-        ← Back
-    </button>
-
-    <div class="settings-container">
-        <!-- Header -->
-        <div class="settings-header">
-            <h1 class="settings-title">Settings</h1>
-            <p class="settings-subtitle">
-                Configure your AISanitizr preferences and manage your data
-            </p>
+    <!-- Header -->
+    <header class="header">
+        <div class="header-left">
+            <a href="index.html" class="back-btn">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7" />
+                </svg>
+                Back
+            </a>
+            <h1 class="header-title">Settings</h1>
         </div>
-
-        <div class="settings-grid">
-            <!-- General Settings -->
-            <div class="setting-section">
-                <div class="section-header">
-                    <div class="section-icon">⚙️</div>
-                    <div>
-                        <h2 class="section-title">General Settings</h2>
-                        <p class="section-description">Core application preferences</p>
-                    </div>
-                </div>
-
-                <div class="setting-item">
-                    <div class="setting-info">
-                        <div class="setting-name">Real-time Processing</div>
-                        <div class="setting-desc">Automatically sanitize text as you type</div>
-                    </div>
-                    <div class="setting-control">
-                        <div class="toggle-switch">
-                            <input type="checkbox" id="realTimeProcessing">
-                            <span class="toggle-slider"></span>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="setting-item">
-                    <div class="setting-info">
-                        <div class="setting-name">Deterministic Replacement</div>
-                        <div class="setting-desc">Generate consistent replacements for the same input</div>
-                    </div>
-                    <div class="setting-control">
-                        <div class="toggle-switch">
-                            <input type="checkbox" id="deterministicReplacement">
-                            <span class="toggle-slider"></span>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="setting-item">
-                    <div class="setting-info">
-                        <div class="setting-name">Preserve Formatting</div>
-                        <div class="setting-desc">Maintain original text structure and spacing</div>
-                    </div>
-                    <div class="setting-control">
-                        <div class="toggle-switch">
-                            <input type="checkbox" id="preserveFormatting">
-                            <span class="toggle-slider"></span>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="setting-item">
-                    <div class="setting-info">
-                        <div class="setting-name">Show Warnings</div>
-                        <div class="setting-desc">Display warning messages and notifications</div>
-                    </div>
-                    <div class="setting-control">
-                        <div class="toggle-switch">
-                            <input type="checkbox" id="showWarnings">
-                            <span class="toggle-slider"></span>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="setting-item">
-                    <div class="setting-info">
-                        <div class="setting-name">Input Debounce Delay</div>
-                        <div class="setting-desc">Delay before processing input changes (0-2000ms)</div>
-                    </div>
-                    <div class="setting-control">
-                        <input type="number" id="debounceDelay" class="form-input" style="width: 100px;" min="0" max="2000" step="50">
-                    </div>
-                </div>
-
-                <div class="setting-item">
-                    <div class="setting-info">
-                        <div class="setting-name">Maximum History Entries</div>
-                        <div class="setting-desc">Maximum number of history entries to keep (10-1000)</div>
-                    </div>
-                    <div class="setting-control">
-                        <input type="number" id="maxHistoryEntries" class="form-input" style="width: 100px;" min="10" max="1000" step="10">
-                    </div>
-                </div>
-            </div>
-
-            <!-- Theme Settings -->
-            <div class="setting-section">
-                <div class="section-header">
-                    <div class="section-icon">🎨</div>
-                    <div>
-                        <h2 class="section-title">Theme Settings</h2>
-                        <p class="section-description">Customize the appearance</p>
-                    </div>
-                </div>
-
-                <div class="form-group">
-                    <label class="form-label">Choose Theme</label>
-                    <div class="theme-preview">
-                        <div class="theme-option light" data-theme="light">
-                            <div style="font-size: 1.5rem; margin-bottom: var(--space-2);">☀️</div>
-                            <div>Light</div>
-                        </div>
-                        <div class="theme-option dark" data-theme="dark">
-                            <div style="font-size: 1.5rem; margin-bottom: var(--space-2);">🌙</div>
-                            <div>Dark</div>
-                        </div>
-                        <div class="theme-option system" data-theme="system">
-                            <div style="font-size: 1.5rem; margin-bottom: var(--space-2);">🖥️</div>
-                            <div>System</div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Storage Management -->
-            <div class="setting-section">
-                <div class="section-header">
-                    <div class="section-icon">💾</div>
-                    <div>
-                        <h2 class="section-title">Storage Management</h2>
-                        <p class="section-description">Manage your local data storage</p>
-                    </div>
-                </div>
-
-                <div class="storage-usage" id="storageUsage">
-                    <!-- Storage usage will be populated by JavaScript -->
-                </div>
-
-                <div class="status-message" style="background: var(--primary-50); color: var(--primary-700); border: 1px solid var(--primary-200);">
-                    <strong>💡 Privacy Note:</strong> All data is stored locally in your browser. 
-                    No information is sent to external servers.
-                </div>
-
-                <div class="actions-grid">
-                    <button class="btn btn-success" id="exportDataBtn">📤 Export All Data</button>
-                    <button class="btn btn-primary" id="importDataBtn">📥 Import Data</button>
-                    <button class="btn btn-danger" id="clearDataBtn">🗑️ Clear All Data</button>
-                </div>
-            </div>
-
-            <!-- Advanced Settings -->
-            <div class="setting-section">
-                <div class="section-header">
-                    <div class="section-icon">🔧</div>
-                    <div>
-                        <h2 class="section-title">Advanced Settings</h2>
-                        <p class="section-description">Advanced configuration options</p>
-                    </div>
-                </div>
-
-                <div class="status-message status-warning">
-                    <strong>⚠️ Warning:</strong> These settings are for advanced users. 
-                    Changing these values may affect performance or functionality.
-                </div>
-
-                <div class="setting-item">
-                    <div class="setting-info">
-                        <div class="setting-name">Debug Mode</div>
-                        <div class="setting-desc">Enable detailed logging and debug information</div>
-                    </div>
-                    <div class="setting-control">
-                        <div class="toggle-switch">
-                            <input type="checkbox" id="debugMode">
-                            <span class="toggle-slider"></span>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="setting-item">
-                    <div class="setting-info">
-                        <div class="setting-name">Performance Monitoring</div>
-                        <div class="setting-desc">Show performance metrics and timing information</div>
-                    </div>
-                    <div class="setting-control">
-                        <div class="toggle-switch">
-                            <input type="checkbox" id="performanceMonitoring">
-                            <span class="toggle-slider"></span>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Actions -->
-            <div class="setting-section">
-                <div class="section-header">
-                    <div class="section-icon">💾</div>
-                    <div>
-                        <h2 class="section-title">Actions</h2>
-                        <p class="section-description">Save, load, or reset your settings</p>
-                    </div>
-                </div>
-
-                <div class="actions-grid">
-                    <button class="btn btn-success" id="saveSettingsBtn">💾 Save Settings</button>
-                    <button class="btn btn-secondary" id="loadSettingsBtn">🔄 Reload Settings</button>
-                    <button class="btn btn-danger" id="resetSettingsBtn">🔄 Reset to Defaults</button>
-                    <button class="btn btn-primary" id="debugSettingsBtn">🐛 Debug Info</button>
-                </div>
-
-                <div id="saveStatus">
-                    <!-- Save status will be shown here -->
-                </div>
-            </div>
+        <div class="header-right">
+            <button class="theme-toggle" id="theme-toggle" title="Toggle dark mode">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z" />
+                </svg>
+            </button>
         </div>
+    </header>
+    
+    <div class="layout">
+        <!-- Sidebar Navigation -->
+        <nav class="sidebar">
+            <div class="nav-section">
+                <div class="nav-label">Settings</div>
+                <button class="nav-item active" data-section="general">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                    </svg>
+                    General
+                </button>
+                <button class="nav-item" data-section="appearance">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M7 21a4 4 0 01-4-4V5a2 2 0 012-2h4a2 2 0 012 2v12a4 4 0 01-4 4zm0 0h12a2 2 0 002-2v-4a2 2 0 00-2-2h-2.343M11 7.343l1.657-1.657a2 2 0 012.828 0l2.829 2.829a2 2 0 010 2.828l-8.486 8.485M7 17h.01" />
+                    </svg>
+                    Appearance
+                </button>
+                <button class="nav-item" data-section="sanitization">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
+                    </svg>
+                    Sanitization
+                </button>
+                <button class="nav-item" data-section="storage">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M4 7v10c0 2.21 3.582 4 8 4s8-1.79 8-4V7M4 7c0 2.21 3.582 4 8 4s8-1.79 8-4M4 7c0-2.21 3.582-4 8-4s8 1.79 8 4m0 5c0 2.21-3.582 4-8 4s-8-1.79-8-4" />
+                    </svg>
+                    Storage
+                </button>
+            </div>
+            <div class="nav-section">
+                <div class="nav-label">More</div>
+                <button class="nav-item" data-section="about">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                    About
+                </button>
+            </div>
+        </nav>
+        
+        <!-- Main Content -->
+        <main class="main">
+            <!-- General Section -->
+            <section class="section active" id="section-general">
+                <div class="section-header">
+                    <h2 class="section-title">General Settings</h2>
+                    <p class="section-desc">Configure how AISanitizr processes your data</p>
+                </div>
+                
+                <div class="card">
+                    <div class="card-title">
+                        <div class="card-title-icon">⚡</div>
+                        Processing
+                    </div>
+                    
+                    <div class="setting-row">
+                        <div class="setting-info">
+                            <div class="setting-label">Real-time Processing</div>
+                            <div class="setting-desc">Automatically sanitize as you type</div>
+                        </div>
+                        <div class="setting-control">
+                            <label class="toggle">
+                                <input type="checkbox" id="realTimeProcessing" checked>
+                                <span class="toggle-slider"></span>
+                            </label>
+                        </div>
+                    </div>
+                    
+                    <div class="setting-row">
+                        <div class="setting-info">
+                            <div class="setting-label">Deterministic Replacement</div>
+                            <div class="setting-desc">Same input always produces same output</div>
+                        </div>
+                        <div class="setting-control">
+                            <label class="toggle">
+                                <input type="checkbox" id="deterministicReplacement" checked>
+                                <span class="toggle-slider"></span>
+                            </label>
+                        </div>
+                    </div>
+                    
+                    <div class="setting-row">
+                        <div class="setting-info">
+                            <div class="setting-label">Preserve Formatting</div>
+                            <div class="setting-desc">Keep original whitespace and structure</div>
+                        </div>
+                        <div class="setting-control">
+                            <label class="toggle">
+                                <input type="checkbox" id="preserveFormatting" checked>
+                                <span class="toggle-slider"></span>
+                            </label>
+                        </div>
+                    </div>
+                    
+                    <div class="setting-row">
+                        <div class="setting-info">
+                            <div class="setting-label">Input Debounce</div>
+                            <div class="setting-desc">Delay before processing (milliseconds)</div>
+                        </div>
+                        <div class="setting-control">
+                            <input type="number" class="number-input" id="debounceDelay" value="300" min="0" max="2000" step="50">
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="card">
+                    <div class="card-title">
+                        <div class="card-title-icon">🔔</div>
+                        Notifications
+                    </div>
+                    
+                    <div class="setting-row">
+                        <div class="setting-info">
+                            <div class="setting-label">Show Warnings</div>
+                            <div class="setting-desc">Display warnings about potential issues</div>
+                        </div>
+                        <div class="setting-control">
+                            <label class="toggle">
+                                <input type="checkbox" id="showWarnings" checked>
+                                <span class="toggle-slider"></span>
+                            </label>
+                        </div>
+                    </div>
+                </div>
+            </section>
+            
+            <!-- Appearance Section -->
+            <section class="section" id="section-appearance">
+                <div class="section-header">
+                    <h2 class="section-title">Appearance</h2>
+                    <p class="section-desc">Customize how AISanitizr looks</p>
+                </div>
+                
+                <div class="card">
+                    <div class="card-title">
+                        <div class="card-title-icon">🌓</div>
+                        Theme
+                    </div>
+                    
+                    <div class="theme-grid">
+                        <div class="theme-card" data-theme="light">
+                            <div class="theme-card-icon">☀️</div>
+                            <div class="theme-card-label">Light</div>
+                        </div>
+                        <div class="theme-card" data-theme="dark">
+                            <div class="theme-card-icon">🌙</div>
+                            <div class="theme-card-label">Dark</div>
+                        </div>
+                        <div class="theme-card" data-theme="system">
+                            <div class="theme-card-icon">💻</div>
+                            <div class="theme-card-label">System</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="card">
+                    <div class="card-title">
+                        <div class="card-title-icon">🎨</div>
+                        Accent Color
+                    </div>
+                    
+                    <div class="color-grid">
+                        <div class="color-option color-blue active" data-color="blue"></div>
+                        <div class="color-option color-purple" data-color="purple"></div>
+                        <div class="color-option color-green" data-color="green"></div>
+                        <div class="color-option color-orange" data-color="orange"></div>
+                        <div class="color-option color-pink" data-color="pink"></div>
+                        <div class="color-option color-teal" data-color="teal"></div>
+                    </div>
+                </div>
+            </section>
+            
+            <!-- Sanitization Section -->
+            <section class="section" id="section-sanitization">
+                <div class="section-header">
+                    <h2 class="section-title">Sanitization Rules</h2>
+                    <p class="section-desc">Configure custom sanitization patterns</p>
+                </div>
+                
+                <div class="card">
+                    <div class="card-title">
+                        <div class="card-title-icon">🏢</div>
+                        Company Name
+                    </div>
+                    
+                    <div class="input-group">
+                        <label class="input-label">Company name to sanitize</label>
+                        <input type="text" class="text-input" id="companyName" placeholder="e.g., Acme Corporation">
+                    </div>
+                    
+                    <div class="input-group">
+                        <label class="input-label">Replace with</label>
+                        <input type="text" class="text-input" id="companyReplacement" placeholder="e.g., [COMPANY] or Generic Corp">
+                    </div>
+                </div>
+                
+                <div class="card">
+                    <div class="card-title">
+                        <div class="card-title-icon">🔒</div>
+                        Custom Sensitive Words
+                    </div>
+                    
+                    <div class="input-group">
+                        <label class="input-label">Add words to always sanitize (press Enter)</label>
+                        <input type="text" class="text-input" id="customWordInput" placeholder="Type a word and press Enter...">
+                    </div>
+                    
+                    <div class="word-tags" id="wordTags"></div>
+                </div>
+                
+                <div class="card">
+                    <div class="card-title">
+                        <div class="card-title-icon">📋</div>
+                        History
+                    </div>
+                    
+                    <div class="setting-row">
+                        <div class="setting-info">
+                            <div class="setting-label">Maximum History Entries</div>
+                            <div class="setting-desc">How many sanitization records to keep</div>
+                        </div>
+                        <div class="setting-control">
+                            <input type="number" class="number-input" id="maxHistoryEntries" value="100" min="10" max="1000" step="10">
+                        </div>
+                    </div>
+                </div>
+            </section>
+            
+            <!-- Storage Section -->
+            <section class="section" id="section-storage">
+                <div class="section-header">
+                    <h2 class="section-title">Storage</h2>
+                    <p class="section-desc">Manage your local data</p>
+                </div>
+                
+                <div class="alert alert-info">
+                    <span class="alert-icon">🔐</span>
+                    <div>All data is stored locally in your browser. Nothing is sent to external servers.</div>
+                </div>
+                
+                <div class="card">
+                    <div class="card-title">
+                        <div class="card-title-icon">💾</div>
+                        Storage Usage
+                    </div>
+                    
+                    <div class="storage-bar-container">
+                        <div class="storage-bar">
+                            <div class="storage-bar-fill" id="storageBarFill" style="width: 15%"></div>
+                        </div>
+                        <div class="storage-stats">
+                            <span id="storageUsed">0 KB used</span>
+                            <span id="storagePercent">0%</span>
+                            <span id="storageAvailable">5 MB available</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="card">
+                    <div class="card-title">
+                        <div class="card-title-icon">📦</div>
+                        Data Management
+                    </div>
+                    
+                    <div class="btn-group">
+                        <button class="btn btn-primary" id="exportBtn">
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" />
+                            </svg>
+                            Export Data
+                        </button>
+                        <button class="btn btn-secondary" id="importBtn">
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+                            </svg>
+                            Import Data
+                        </button>
+                    </div>
+                    
+                    <div class="btn-group" style="margin-top: 12px;">
+                        <button class="btn btn-danger" id="clearHistoryBtn">Clear History</button>
+                        <button class="btn btn-danger" id="clearAllBtn">Reset Everything</button>
+                    </div>
+                </div>
+            </section>
+            
+            <!-- About Section -->
+            <section class="section" id="section-about">
+                <div class="section-header">
+                    <h2 class="section-title">About</h2>
+                    <p class="section-desc">Information about AISanitizr and your privacy</p>
+                </div>
+                
+                <!-- Privacy Shield -->
+                <div class="privacy-shield">
+                    <div class="privacy-shield-icon">🔐</div>
+                    <div class="privacy-shield-title">Your Data is 100% Safe</div>
+                    <div class="privacy-shield-text">
+                        AISanitizr runs entirely in your browser. Your data never leaves your device and is never sent to any server.
+                    </div>
+                    <div class="privacy-features">
+                        <div class="privacy-feature">
+                            <span class="privacy-feature-icon">🏠</span>
+                            <span>100% Local Processing</span>
+                        </div>
+                        <div class="privacy-feature">
+                            <span class="privacy-feature-icon">🚫</span>
+                            <span>No Server Uploads</span>
+                        </div>
+                        <div class="privacy-feature">
+                            <span class="privacy-feature-icon">🔒</span>
+                            <span>No Data Collection</span>
+                        </div>
+                        <div class="privacy-feature">
+                            <span class="privacy-feature-icon">👁️</span>
+                            <span>No Tracking</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="card">
+                    <div class="card-title">
+                        <div class="card-title-icon">🛡️</div>
+                        AISanitizr
+                    </div>
+                    
+                    <p style="color: var(--text-secondary); margin-bottom: 16px;">
+                        AISanitizr is a privacy-focused tool for sanitizing sensitive data before sharing with AI assistants, 
+                        colleagues, or public forums. It uses the Bulletproof Engine with 50+ detection patterns for 
+                        comprehensive data protection.
+                    </p>
+                    
+                    <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; margin-top: 16px;">
+                        <div style="padding: 16px; background: var(--bg-tertiary); border-radius: 8px; text-align: center;">
+                            <div style="font-size: 24px; font-weight: 700; color: var(--accent);">50+</div>
+                            <div style="font-size: 13px; color: var(--text-muted);">Detection Rules</div>
+                        </div>
+                        <div style="padding: 16px; background: var(--bg-tertiary); border-radius: 8px; text-align: center;">
+                            <div style="font-size: 24px; font-weight: 700; color: var(--success);">90%+</div>
+                            <div style="font-size: 13px; color: var(--text-muted);">Coverage</div>
+                        </div>
+                    </div>
+                    
+                    <p style="color: var(--text-muted); font-size: 13px; margin-top: 20px;">
+                        Version 1.0.0 • Built with ❤️ for privacy
+                    </p>
+                </div>
+                
+                <!-- FAQ Section -->
+                <div class="card">
+                    <div class="card-title">
+                        <div class="card-title-icon">❓</div>
+                        Frequently Asked Questions
+                    </div>
+                    
+                    <div class="faq-item">
+                        <button class="faq-question">
+                            <span>Is my data sent to any server?</span>
+                            <svg class="faq-icon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7" />
+                            </svg>
+                        </button>
+                        <div class="faq-answer">
+                            <div class="faq-answer-content">
+                                <strong>No, absolutely not.</strong> AISanitizr runs 100% in your browser using JavaScript. Your data never leaves your device. There are no API calls, no server uploads, no cloud processing. Everything happens locally on your computer.
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="faq-item">
+                        <button class="faq-question">
+                            <span>Where is my data stored?</span>
+                            <svg class="faq-icon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7" />
+                            </svg>
+                        </button>
+                        <div class="faq-answer">
+                            <div class="faq-answer-content">
+                                All data (settings, history, custom rules) is stored in your browser's <strong>localStorage</strong>. This is a private storage area that only this website can access. Clearing your browser data will remove all stored information.
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="faq-item">
+                        <button class="faq-question">
+                            <span>What types of data can AISanitizr detect?</span>
+                            <svg class="faq-icon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7" />
+                            </svg>
+                        </button>
+                        <div class="faq-answer">
+                            <div class="faq-answer-content">
+                                AISanitizr can detect and mask: <strong>emails, phone numbers, credit cards, SSNs, IP addresses, AWS keys, API tokens, passwords, URLs, dates of birth, names, addresses</strong>, and many more patterns. The Bulletproof Engine includes 50+ detection rules.
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="faq-item">
+                        <button class="faq-question">
+                            <span>Can I add my own words to sanitize?</span>
+                            <svg class="faq-icon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7" />
+                            </svg>
+                        </button>
+                        <div class="faq-answer">
+                            <div class="faq-answer-content">
+                                Yes! Go to the <strong>Sanitization</strong> tab in settings. You can add your company name, project names, or any custom words that should always be replaced. These custom rules are stored locally.
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="faq-item">
+                        <button class="faq-question">
+                            <span>Is AISanitizr open source?</span>
+                            <svg class="faq-icon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7" />
+                            </svg>
+                        </button>
+                        <div class="faq-answer">
+                            <div class="faq-answer-content">
+                                AISanitizr is built with transparency in mind. You can inspect all the code running in your browser using Developer Tools. The entire sanitization logic runs client-side with no obfuscation.
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="faq-item">
+                        <button class="faq-question">
+                            <span>Will sanitization change the meaning of my text?</span>
+                            <svg class="faq-icon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7" />
+                            </svg>
+                        </button>
+                        <div class="faq-answer">
+                            <div class="faq-answer-content">
+                                AISanitizr uses <strong>deterministic replacement</strong>, meaning the same input always produces the same output. This preserves relationships in your data. For example, if "john@email.com" appears twice, it will be replaced with the same fake email both times.
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </main>
     </div>
-
+    
+    <!-- Toast -->
+    <div class="toast" id="toast"></div>
+    
     <script src="storage.js"></script>
     <script>
         const storage = window.storage;
-        let currentSettings = {};
-
-        // Initialize the page
-        document.addEventListener('DOMContentLoaded', function() {
-            if (!window.storage) {
-                console.error('Storage module not available');
-                document.getElementById('saveStatus').innerHTML = '<div class="status-message status-error">❌ Storage module not loaded. Please refresh the page.</div>';
-                return;
-            }
-            
-            console.log('Settings page initialized');
-            loadSettings();
-            setupEventListeners();
-            updateStorageUsage();
-        });
-
-        function setupEventListeners() {
-            try {
-                // Theme selection
-                document.querySelectorAll('.theme-option').forEach(option => {
-                    option.addEventListener('click', function() {
-                        selectTheme(this.dataset.theme);
-                    });
-                });
+        let customWords = [];
+        
+        // Navigation
+        document.querySelectorAll('.nav-item').forEach(item => {
+            item.addEventListener('click', () => {
+                const section = item.dataset.section;
                 
-                // Auto-save on changes
-                const inputs = document.querySelectorAll('input, select');
-                inputs.forEach(input => {
-                    input.addEventListener('change', function() {
-                        setTimeout(saveSettings, 500); // Auto-save after 500ms
-                    });
-                });
+                document.querySelectorAll('.nav-item').forEach(i => i.classList.remove('active'));
+                item.classList.add('active');
                 
-                // Action buttons
-                document.getElementById('exportDataBtn').addEventListener('click', exportAllData);
-                document.getElementById('importDataBtn').addEventListener('click', importAllData);
-                document.getElementById('clearDataBtn').addEventListener('click', clearAllData);
-                document.getElementById('saveSettingsBtn').addEventListener('click', saveSettings);
-                document.getElementById('loadSettingsBtn').addEventListener('click', loadSettings);
-                document.getElementById('resetSettingsBtn').addEventListener('click', resetSettings);
-                document.getElementById('debugSettingsBtn').addEventListener('click', debugSettings);
-            } catch (error) {
-                console.error('Error setting up event listeners:', error);
-            }
-        }
-
-        function loadSettings() {
-            try {
-                currentSettings = storage.getSettings();
-                
-                // Update UI elements
-                const elements = {
-                    'realTimeProcessing': currentSettings.realTimeProcessing,
-                    'deterministicReplacement': currentSettings.deterministicReplacement,
-                    'preserveFormatting': currentSettings.preserveFormatting,
-                    'showWarnings': currentSettings.showWarnings,
-                    'debounceDelay': currentSettings.debounceDelay,
-                    'maxHistoryEntries': currentSettings.maxHistoryEntries,
-                    'debugMode': currentSettings.debugMode || false,
-                    'performanceMonitoring': currentSettings.performanceMonitoring || false
-                };
-                
-                for (const [id, value] of Object.entries(elements)) {
-                    const element = document.getElementById(id);
-                    if (element) {
-                        if (element.type === 'checkbox') {
-                            element.checked = Boolean(value);
-                        } else {
-                            element.value = value;
-                        }
-                    }
-                }
-                
-                // Theme selection
-                selectTheme(currentSettings.theme || 'system');
-            } catch (error) {
-                console.error('Error loading settings:', error);
-                showStatus('❌ Error loading settings: ' + error.message, 'error');
-            }
-        }
-
-        function selectTheme(theme) {
-            // Update UI
-            document.querySelectorAll('.theme-option').forEach(option => {
-                option.classList.remove('active');
+                document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+                document.getElementById(`section-${section}`).classList.add('active');
             });
-            const themeOption = document.querySelector(`[data-theme="${theme}"]`);
-            if (themeOption) {
-                themeOption.classList.add('active');
-            }
-            
-            // Apply theme to current page
-            document.body.className = `theme-${theme}`;
-            
-            currentSettings.theme = theme;
-        }
-
-        function saveSettings() {
-            try {
-                // Collect all settings
-                const settings = {
-                    ...currentSettings,
-                    realTimeProcessing: document.getElementById('realTimeProcessing').checked,
-                    deterministicReplacement: document.getElementById('deterministicReplacement').checked,
-                    preserveFormatting: document.getElementById('preserveFormatting').checked,
-                    showWarnings: document.getElementById('showWarnings').checked,
-                    debounceDelay: parseInt(document.getElementById('debounceDelay').value) || 300,
-                    maxHistoryEntries: parseInt(document.getElementById('maxHistoryEntries').value) || 100,
-                    debugMode: document.getElementById('debugMode').checked,
-                    performanceMonitoring: document.getElementById('performanceMonitoring').checked
-                };
+        });
+        
+        // Theme Toggle
+        document.getElementById('theme-toggle').addEventListener('click', () => {
+            const html = document.documentElement;
+            const current = html.dataset.theme;
+            html.dataset.theme = current === 'dark' ? 'light' : 'dark';
+            saveSettings();
+        });
+        
+        // Theme Cards
+        document.querySelectorAll('.theme-card').forEach(card => {
+            card.addEventListener('click', () => {
+                document.querySelectorAll('.theme-card').forEach(c => c.classList.remove('active'));
+                card.classList.add('active');
                 
-                const success = storage.saveSettings(settings);
-                
-                if (success) {
-                    showStatus('✅ Settings saved successfully!', 'success');
-                    currentSettings = settings;
+                const theme = card.dataset.theme;
+                if (theme === 'system') {
+                    const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+                    document.documentElement.dataset.theme = prefersDark ? 'dark' : 'light';
                 } else {
-                    showStatus('❌ Failed to save settings', 'error');
+                    document.documentElement.dataset.theme = theme;
                 }
-            } catch (error) {
-                console.error('Error saving settings:', error);
-                showStatus('❌ Error saving settings: ' + error.message, 'error');
-            }
-        }
-
-        function resetSettings() {
-            if (confirm('Are you sure you want to reset all settings to defaults?')) {
-                const defaultSettings = storage.getDefaultSettings();
-                const success = storage.saveSettings(defaultSettings);
-                
-                if (success) {
-                    loadSettings();
-                    showStatus('✅ Settings reset to defaults!', 'success');
-                } else {
-                    showStatus('❌ Failed to reset settings', 'error');
+                saveSettings();
+            });
+        });
+        
+        // Color Options
+        document.querySelectorAll('.color-option').forEach(option => {
+            option.addEventListener('click', () => {
+                document.querySelectorAll('.color-option').forEach(o => o.classList.remove('active'));
+                option.classList.add('active');
+                saveSettings();
+            });
+        });
+        
+        // Custom Words
+        document.getElementById('customWordInput').addEventListener('keydown', (e) => {
+            if (e.key === 'Enter' && e.target.value.trim()) {
+                const word = e.target.value.trim();
+                if (!customWords.includes(word)) {
+                    customWords.push(word);
+                    renderWordTags();
+                    saveSettings();
                 }
+                e.target.value = '';
             }
+        });
+        
+        function renderWordTags() {
+            const container = document.getElementById('wordTags');
+            container.innerHTML = customWords.map((word, i) => `
+                <span class="word-tag">
+                    ${word}
+                    <button class="word-tag-remove" data-index="${i}">×</button>
+                </span>
+            `).join('');
+            
+            container.querySelectorAll('.word-tag-remove').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    customWords.splice(parseInt(btn.dataset.index), 1);
+                    renderWordTags();
+                    saveSettings();
+                });
+            });
         }
-
-        function updateStorageUsage() {
-            try {
-                const usage = storage.getStorageUsage();
-                const usageDiv = document.getElementById('storageUsage');
-                
-                let fillClass = '';
-                if (usage.percentage > 90) fillClass = 'danger';
-                else if (usage.percentage > 70) fillClass = 'warning';
-                
-                usageDiv.innerHTML = `
-                    <h4 style="margin: 0 0 var(--space-3) 0; font-size: 1rem; font-weight: 600;">Storage Usage</h4>
-                    <div class="usage-bar">
-                        <div class="usage-fill ${fillClass}" style="width: ${usage.percentage}%"></div>
-                    </div>
-                    <div style="display: flex; justify-content: space-between; font-size: 0.75rem; color: var(--gray-600);">
-                        <span>Used: ${(usage.used / 1024).toFixed(1)} KB</span>
-                        <span>${usage.percentage}%</span>
-                        <span>Available: ${(usage.available / 1024).toFixed(1)} KB</span>
-                    </div>
-                    ${usage.percentage > 80 ? '<div class="status-message status-warning" style="margin-top: var(--space-3);"><strong>⚠️ Storage Warning:</strong> You are running low on storage space. Consider clearing old history entries.</div>' : ''}
-                `;
-            } catch (error) {
-                console.error('Error updating storage usage:', error);
-                document.getElementById('storageUsage').innerHTML = '<div class="status-message status-error">❌ Error loading storage usage</div>';
-            }
-        }
-
-        function exportAllData() {
+        
+        // Storage Actions
+        document.getElementById('exportBtn').addEventListener('click', () => {
             try {
                 const data = storage.exportData();
-                
                 const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
                 const url = URL.createObjectURL(blob);
                 const a = document.createElement('a');
@@ -640,93 +1266,181 @@
                 a.download = `aisanitizr-backup-${new Date().toISOString().split('T')[0]}.json`;
                 a.click();
                 URL.revokeObjectURL(url);
-                
-                showStatus('✅ Data exported successfully!', 'success');
-            } catch (error) {
-                console.error('Error exporting data:', error);
-                showStatus('❌ Error exporting data: ' + error.message, 'error');
+                showToast('Data exported successfully!');
+            } catch (e) {
+                showToast('Export failed: ' + e.message);
             }
-        }
-
-        function importAllData() {
-            try {
-                const input = document.createElement('input');
-                input.type = 'file';
-                input.accept = '.json';
-                input.onchange = function(event) {
-                    const file = event.target.files[0];
-                    if (file) {
-                        const reader = new FileReader();
-                        reader.onload = function(e) {
-                            try {
-                                const data = JSON.parse(e.target.result);
-                                
-                                if (confirm(`Import data from ${data.exportDate ? new Date(data.exportDate).toLocaleDateString() : 'unknown date'}? This will replace all current data.`)) {
-                                    const success = storage.importData(data);
-                                    
-                                    if (success) {
-                                        loadSettings();
-                                        updateStorageUsage();
-                                        showStatus('✅ Data imported successfully!', 'success');
-                                    } else {
-                                        showStatus('❌ Failed to import data', 'error');
-                                    }
-                                }
-                            } catch (error) {
-                                console.error('Error parsing import file:', error);
-                                showStatus('❌ Invalid backup file format', 'error');
+        });
+        
+        document.getElementById('importBtn').addEventListener('click', () => {
+            const input = document.createElement('input');
+            input.type = 'file';
+            input.accept = '.json';
+            input.onchange = (e) => {
+                const file = e.target.files[0];
+                if (file) {
+                    const reader = new FileReader();
+                    reader.onload = (evt) => {
+                        try {
+                            const data = JSON.parse(evt.target.result);
+                            if (confirm('Import this backup? Current data will be replaced.')) {
+                                storage.importData(data);
+                                loadSettings();
+                                updateStorageUsage();
+                                showToast('Data imported successfully!');
                             }
-                        };
-                        reader.readAsText(file);
-                    }
-                };
-                input.click();
-            } catch (error) {
-                console.error('Error importing data:', error);
-                showStatus('❌ Error importing data: ' + error.message, 'error');
+                        } catch (err) {
+                            showToast('Invalid backup file');
+                        }
+                    };
+                    reader.readAsText(file);
+                }
+            };
+            input.click();
+        });
+        
+        document.getElementById('clearHistoryBtn').addEventListener('click', () => {
+            if (confirm('Clear all history? This cannot be undone.')) {
+                storage.clearHistory();
+                updateStorageUsage();
+                showToast('History cleared');
             }
-        }
-
-        function clearAllData() {
-            if (confirm('Are you sure you want to clear ALL data? This includes rules, history, settings, and profiles. This cannot be undone.')) {
-                if (confirm('This is your final warning. ALL DATA WILL BE PERMANENTLY DELETED. Continue?')) {
-                    try {
-                        localStorage.clear();
-                        storage.initializeStorage();
-                        loadSettings();
-                        updateStorageUsage();
-                        showStatus('✅ All data cleared successfully!', 'success');
-                    } catch (error) {
-                        showStatus('❌ Failed to clear data: ' + error.message, 'error');
-                    }
+        });
+        
+        document.getElementById('clearAllBtn').addEventListener('click', () => {
+            if (confirm('Reset everything? All settings and data will be lost.')) {
+                if (confirm('Are you absolutely sure?')) {
+                    localStorage.clear();
+                    storage.initializeStorage();
+                    loadSettings();
+                    updateStorageUsage();
+                    showToast('All data cleared');
                 }
             }
+        });
+        
+        // Auto-save on input change
+        document.querySelectorAll('input').forEach(input => {
+            input.addEventListener('change', () => setTimeout(saveSettings, 300));
+        });
+        
+        // Toast
+        function showToast(message) {
+            const toast = document.getElementById('toast');
+            toast.textContent = message;
+            toast.classList.add('show');
+            setTimeout(() => toast.classList.remove('show'), 3000);
         }
-
-        function debugSettings() {
-            console.log('=== DEBUG SETTINGS ===');
-            console.log('Storage object:', window.storage);
-            console.log('Current settings:', currentSettings);
-            
-            const debugInfo = {
-                storageAvailable: !!window.storage,
-                currentSettings: currentSettings,
-                storageUsage: storage.getStorageUsage(),
-                defaultSettings: storage.getDefaultSettings()
-            };
-            
-            console.log('Debug info:', debugInfo);
-            showStatus('🐛 Debug information logged to console', 'success');
+        
+        // Load Settings
+        function loadSettings() {
+            try {
+                const settings = storage.getSettings();
+                
+                // Checkboxes
+                document.getElementById('realTimeProcessing').checked = settings.realTimeProcessing !== false;
+                document.getElementById('deterministicReplacement').checked = settings.deterministicReplacement !== false;
+                document.getElementById('preserveFormatting').checked = settings.preserveFormatting !== false;
+                document.getElementById('showWarnings').checked = settings.showWarnings !== false;
+                
+                // Numbers
+                document.getElementById('debounceDelay').value = settings.debounceDelay || 300;
+                document.getElementById('maxHistoryEntries').value = settings.maxHistoryEntries || 100;
+                
+                // Theme
+                const themeCard = document.querySelector(`[data-theme="${settings.theme || 'system'}"]`);
+                if (themeCard) {
+                    document.querySelectorAll('.theme-card').forEach(c => c.classList.remove('active'));
+                    themeCard.classList.add('active');
+                }
+                
+                // Color
+                const colorOption = document.querySelector(`[data-color="${settings.accentColor || 'blue'}"]`);
+                if (colorOption) {
+                    document.querySelectorAll('.color-option').forEach(c => c.classList.remove('active'));
+                    colorOption.classList.add('active');
+                }
+                
+                // Custom words
+                if (settings.customSensitiveWords) {
+                    document.getElementById('companyName').value = settings.customSensitiveWords.companyName || '';
+                    document.getElementById('companyReplacement').value = settings.customSensitiveWords.replacement || '';
+                    customWords = settings.customSensitiveWords.customWords || [];
+                    renderWordTags();
+                }
+            } catch (e) {
+                console.error('Error loading settings:', e);
+            }
         }
-
-        function showStatus(message, type) {
-            const statusDiv = document.getElementById('saveStatus');
-            statusDiv.innerHTML = `<div class="status-message status-${type}">${message}</div>`;
-            
-            setTimeout(() => {
-                statusDiv.innerHTML = '';
-            }, 3000);
+        
+        // Save Settings
+        function saveSettings() {
+            try {
+                const settings = {
+                    realTimeProcessing: document.getElementById('realTimeProcessing').checked,
+                    deterministicReplacement: document.getElementById('deterministicReplacement').checked,
+                    preserveFormatting: document.getElementById('preserveFormatting').checked,
+                    showWarnings: document.getElementById('showWarnings').checked,
+                    debounceDelay: parseInt(document.getElementById('debounceDelay').value) || 300,
+                    maxHistoryEntries: parseInt(document.getElementById('maxHistoryEntries').value) || 100,
+                    theme: document.querySelector('.theme-card.active')?.dataset.theme || 'system',
+                    accentColor: document.querySelector('.color-option.active')?.dataset.color || 'blue',
+                    customSensitiveWords: {
+                        companyName: document.getElementById('companyName').value.trim(),
+                        replacement: document.getElementById('companyReplacement').value.trim() || '[COMPANY]',
+                        customWords: customWords
+                    }
+                };
+                
+                storage.saveSettings(settings);
+            } catch (e) {
+                console.error('Error saving settings:', e);
+            }
         }
+        
+        // Update Storage Usage
+        function updateStorageUsage() {
+            try {
+                const usage = storage.getStorageUsage();
+                
+                document.getElementById('storageBarFill').style.width = `${usage.percentage}%`;
+                document.getElementById('storageBarFill').className = 'storage-bar-fill' + 
+                    (usage.percentage > 90 ? ' danger' : usage.percentage > 70 ? ' warning' : '');
+                
+                document.getElementById('storageUsed').textContent = `${(usage.used / 1024).toFixed(1)} KB used`;
+                document.getElementById('storagePercent').textContent = `${usage.percentage}%`;
+                document.getElementById('storageAvailable').textContent = `${(usage.available / 1024).toFixed(1)} KB available`;
+            } catch (e) {
+                console.error('Error updating storage:', e);
+            }
+        }
+        
+        // FAQ Accordion
+        function initFAQ() {
+            document.querySelectorAll('.faq-question').forEach(question => {
+                question.addEventListener('click', () => {
+                    const item = question.parentElement;
+                    const isOpen = item.classList.contains('active');
+                    
+                    // Close all other FAQ items
+                    document.querySelectorAll('.faq-item').forEach(faq => {
+                        faq.classList.remove('active');
+                    });
+                    
+                    // Toggle current item
+                    if (!isOpen) {
+                        item.classList.add('active');
+                    }
+                });
+            });
+        }
+        
+        // Initialize
+        document.addEventListener('DOMContentLoaded', () => {
+            loadSettings();
+            updateStorageUsage();
+            initFAQ();
+        });
     </script>
 </body>
 </html>
