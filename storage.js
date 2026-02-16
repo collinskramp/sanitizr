@@ -954,21 +954,9 @@ class StorageModule {
         pattern: 'internal_url',
         replacement: null,
         category: 'company',
-        enabled: true,  // Enabled - catches staging, sandbox, internal URLs
+        enabled: false,  // Disabled by default - user can enable if needed
         name: 'Internal/Staging URLs',
         description: 'Detects internal, staging, dev, test, sandbox URLs and sanitizes company names'
-      },
-      
-      // Internal Hostnames (not URLs - just hosts like db.company.internal)
-      {
-        id: 'builtin_internal_hostname',
-        type: 'builtin',
-        pattern: 'internal_hostname',
-        replacement: null,
-        category: 'company',
-        enabled: true,  // Enabled - catches .internal, .local, .corp hostnames
-        name: 'Internal Hostnames',
-        description: 'Detects internal hostnames (.internal, .local, .corp, .lan)'
       },
       
       // Key-Value Pattern Rules - CRITICAL MISSING PATTERNS

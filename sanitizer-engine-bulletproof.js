@@ -278,14 +278,8 @@ class BulletproofSanitizerEngine {
       
       // Internal/Staging URLs - sanitize subdomains while preserving format
       internal_url: {
-        pattern: /\bhttps?:\/\/(?:[\w-]+\.)*(?:staging|internal|dev|test|sandbox|admin|api|auth|stg|uat|preprod|qa)[\w.-]*\.[\w.-]+(?::\d+)?(?:\/[\w./-]*)?/gi,
+        pattern: /\bhttps?:\/\/(?:[\w-]+\.)*(?:staging|internal|dev|test|sandbox|admin|api|auth)[\w.-]*\.[\w.-]+(?:\/[\w./-]*)?/gi,
         generator: (match) => this.generateInternalURLSafe(match)
-      },
-      
-      // Internal Hostnames - not URLs, just hostnames with .internal, .local, .corp, etc
-      internal_hostname: {
-        pattern: /\b(?:[\w-]+\.)+(?:internal|local|corp|intranet|private|lan|staging|stage|stg)(?:\.\w+)?(?::\d+)?\b/gi,
-        generator: (match) => this.generateInternalHostnameSafe(match)
       },
       
       // IPv6 Addresses
@@ -647,38 +641,6 @@ class BulletproofSanitizerEngine {
     } catch (error) {
       // Fallback: just replace with generic
       return `https://app${rng.nextInt(1000, 9999)}.example.com`;
-    }
-  }
-
-  generateInternalHostnameSafe(original) {
-    const hash = this.safeHash(original);
-    const rng = new this.SecureSeededRNG(hash);
-    
-    try {
-      // Parse hostname and port if present
-      const portMatch = original.match(/:(\d+)$/);
-      const port = portMatch ? portMatch[0] : '';
-      const hostname = portMatch ? original.replace(portMatch[0], '') : original;
-      
-      // Split hostname into parts
-      const parts = hostname.split('.');
-      
-      if (parts.length >= 2) {
-        // Keep the structure but sanitize company/environment names
-        // e.g., "staging-db.ecobank.internal" -> "staging-db.company1234.internal"
-        const tld = parts.pop(); // .internal, .local, .corp, etc
-        const companyPart = parts.pop(); // the company name
-        const sanitizedCompany = `corp${rng.nextInt(1000, 9999)}`;
-        parts.push(sanitizedCompany);
-        parts.push(tld);
-        
-        return parts.join('.') + port;
-      }
-      
-      // Fallback for simple hostnames
-      return `host${rng.nextInt(1000, 9999)}.internal${port}`;
-    } catch (error) {
-      return `host${this.safeHash(original).slice(0, 4)}.internal`;
     }
   }
 
@@ -1559,16 +1521,6 @@ MIIEvQIBADANBgkqhkiG9w0BAQEFAASCBKcwggSjAgEAAoIBAQC7VJTUt9Us8cKB
         patterns.push(new RegExp(`(?<!https?:)(?<!ftp:)(${keyVar})\\s*:\\s*"?([^"\\s\\n,}]+)"?`, 'gi'));
         // Environment format: KEY=value
         patterns.push(new RegExp(`(${keyVar.toUpperCase()})\\s*=\\s*"?([^"\\s\\n]+)"?`, 'gi'));
-        // Mixed case with equals: "API Key=value", "Client Secret=value"
-        patterns.push(new RegExp(`(${keyVar})\\s*=\\s*"?([^"\\s\\n,]+)"?`, 'gi'));
-        // Space-separated words: "API Key value" - match key with optional space before
-        patterns.push(new RegExp(`(?:API\\s+)?(${keyVar})\\s*=\\s*([^\\s\\n,]+)`, 'gi'));
-      }
-      
-      // Log format detection: "word secret actual_secret_value" - secret followed by value
-      if (keyPattern.toLowerCase() === 'secret') {
-        // Match "secret word" or "with secret word" patterns in logs
-        patterns.push(new RegExp(`\\b(secret)\\s+([a-zA-Z0-9_]+(?:[a-zA-Z0-9_]*[a-zA-Z0-9])+)`, 'gi'));
       }
       
       const seenMatches = new Set(); // Deduplicate
