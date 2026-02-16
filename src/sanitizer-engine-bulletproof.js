@@ -701,20 +701,111 @@ class BulletproofSanitizerEngine {
     // Extract the key part (e.g., "API Key=") and replace only the value
     const match = original.match(/^(.+?[=:])\s*(.+)$/);
     if (match) {
-      const keyPart = match[1];
-      const sanitizedValue = `[REDACTED_${rng.nextAlphaNumeric(6)}]`;
-      return `${keyPart}${sanitizedValue}`;
+      const keyPart = match[1].trim();
+      const originalValue = match[2];
+      
+      // Determine key type from the key part
+      const keyLower = keyPart.toLowerCase();
+      let keyType = 'secret';
+      if (keyLower.includes('key')) keyType = 'api_key';
+      else if (keyLower.includes('password')) keyType = 'password';
+      else if (keyLower.includes('token')) keyType = 'token';
+      else if (keyLower.includes('secret')) keyType = 'secret';
+      
+      const fakeValue = this.generateFakeValueForKeyType(keyType, originalValue);
+      return `${keyPart} ${fakeValue}`;
     }
     
-    return `[REDACTED_${rng.nextAlphaNumeric(8)}]`;
+    return rng.nextAlphaNumeric(16);
   }
 
   generateSecretValueLogSafe(original) {
     const hash = this.safeHash(original);
     const rng = new this.SecureSeededRNG(hash);
     
-    // Keep "secret " prefix and replace the value
-    return `secret [REDACTED_${rng.nextAlphaNumeric(8)}]`;
+    // Extract the actual secret value (after "secret ")
+    const match = original.match(/secret\s+(.+)/i);
+    if (match) {
+      const fakeSecret = this.generateFakeValueForKeyType('secret', match[1]);
+      return `secret ${fakeSecret}`;
+    }
+    return `secret ${rng.nextAlphaNumeric(16)}`;
+  }
+
+  /**
+   * Generate realistic fake values for key-value patterns
+   * Maintains format and context of the original value
+   */
+  generateFakeValueForKeyType(keyType, originalValue) {
+    const hash = this.safeHash(originalValue);
+    const rng = new this.SecureSeededRNG(hash);
+    const keyLower = keyType.toLowerCase();
+    const len = originalValue.length;
+    
+    // Password-like values - generate realistic looking passwords
+    if (keyLower.includes('password') || keyLower.includes('passwd')) {
+      const words = ['Secure', 'Secret', 'Safe', 'Strong', 'Private'];
+      const word = words[rng.nextInt(0, words.length - 1)];
+      return `${word}Pass${rng.nextInt(100, 999)}!`;
+    }
+    
+    // Secret/Token values - alphanumeric with similar structure
+    if (keyLower.includes('secret') || keyLower.includes('token')) {
+      // Preserve prefix patterns like "stg_", "sk_", "pk_"
+      const prefixMatch = originalValue.match(/^([a-zA-Z]{2,4}_)/);
+      if (prefixMatch) {
+        return `${prefixMatch[1]}${rng.nextAlphaNumeric(Math.max(8, len - prefixMatch[1].length))}`;
+      }
+      return rng.nextAlphaNumeric(Math.max(16, len));
+    }
+    
+    // API Keys - maintain structure with prefixes
+    if (keyLower.includes('api') || keyLower.includes('key')) {
+      const prefixMatch = originalValue.match(/^([a-zA-Z]{2,6}_)/);
+      if (prefixMatch) {
+        return `${prefixMatch[1]}${rng.nextAlphaNumeric(Math.max(12, len - prefixMatch[1].length))}`;
+      }
+      return rng.nextAlphaNumeric(Math.max(20, len));
+    }
+    
+    // Access Key IDs (AWS-like)
+    if (keyLower.includes('accesskey') || keyLower.includes('access_key')) {
+      const prefix = originalValue.substring(0, 4).toUpperCase();
+      if (/^A[KS]IA/.test(prefix)) {
+        return `${prefix}${rng.nextAlphaNumeric(16)}`;
+      }
+      return `AKIA${rng.nextAlphaNumeric(16)}`;
+    }
+    
+    // Private keys
+    if (keyLower.includes('private') || keyLower.includes('priv')) {
+      const prefixMatch = originalValue.match(/^(sk_|priv_)/i);
+      if (prefixMatch) {
+        return `${prefixMatch[1]}${rng.nextAlphaNumeric(Math.max(16, len - prefixMatch[1].length))}`;
+      }
+      return `sk_${rng.nextAlphaNumeric(24)}`;
+    }
+    
+    // Bearer tokens
+    if (keyLower.includes('bearer')) {
+      return `Bearer ${rng.nextAlphaNumeric(32)}`;
+    }
+    
+    // Connection strings / URLs
+    if (keyLower.includes('connection') || keyLower.includes('url') || keyLower.includes('uri')) {
+      if (originalValue.includes('://')) {
+        return this.generateDatabaseConnectionSafe(originalValue);
+      }
+      return rng.nextAlphaNumeric(len);
+    }
+    
+    // Default: generate alphanumeric of similar length, preserve any prefix
+    const prefixMatch = originalValue.match(/^([a-zA-Z]{2,6}_)/);
+    if (prefixMatch) {
+      return `${prefixMatch[1]}${rng.nextAlphaNumeric(Math.max(8, len - prefixMatch[1].length))}`;
+    }
+    
+    return rng.nextAlphaNumeric(Math.max(12, len));
   }
 
   generateDatabaseConnectionSafe(original) {
@@ -1626,6 +1717,9 @@ MIIEvQIBADANBgkqhkiG9w0BAQEFAASCBKcwggSjAgEAAoIBAQC7VJTUt9Us8cKB
           // Skip boolean and numeric values
           if (/^(true|false|null|\d+)$/i.test(value)) continue;
           
+          // Generate realistic fake value based on key pattern type
+          const fakeValue = this.generateFakeValueForKeyType(keyPattern, value);
+          
           const detection = {
             ruleId: rule.id,
             ruleName: rule.name || rule.pattern,
@@ -1634,7 +1728,7 @@ MIIEvQIBADANBgkqhkiG9w0BAQEFAASCBKcwggSjAgEAAoIBAQC7VJTUt9Us8cKB
             match: match[0],
             startIndex: match.index,
             endIndex: match.index + match[0].length,
-            replacement: match[0].replace(value, `[REDACTED_${keyPattern.toUpperCase()}]`),
+            replacement: match[0].replace(value, fakeValue),
             selected: true
           };
           
