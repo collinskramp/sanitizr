@@ -288,6 +288,18 @@ class BulletproofSanitizerEngine {
         generator: (match) => this.generateInternalHostnameSafe(match)
       },
       
+      // Log format: "API Key=value", "Secret=value" with space-separated key words
+      log_key_value: {
+        pattern: /\b(?:API\s+Key|Secret|Password|Token|Credential|Auth)\s*[=:]\s*([^\s\n,;]+)/gi,
+        generator: (match) => this.generateLogKeyValueSafe(match)
+      },
+      
+      // "secret word" pattern in logs - catches "secret actual_value"
+      secret_value_log: {
+        pattern: /\bsecret\s+([a-zA-Z0-9_-]{8,})/gi,
+        generator: (match) => this.generateSecretValueLogSafe(match)
+      },
+      
       // IPv6 Addresses
       ipv6: {
         pattern: /\b(?:[0-9a-fA-F]{1,4}:){7}[0-9a-fA-F]{1,4}\b|\b::1\b|\b::ffff:[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\b/g,
@@ -680,6 +692,29 @@ class BulletproofSanitizerEngine {
     } catch (error) {
       return `host${this.safeHash(original).slice(0, 4)}.internal`;
     }
+  }
+
+  generateLogKeyValueSafe(original) {
+    const hash = this.safeHash(original);
+    const rng = new this.SecureSeededRNG(hash);
+    
+    // Extract the key part (e.g., "API Key=") and replace only the value
+    const match = original.match(/^(.+?[=:])\s*(.+)$/);
+    if (match) {
+      const keyPart = match[1];
+      const sanitizedValue = `[REDACTED_${rng.nextAlphaNumeric(6)}]`;
+      return `${keyPart}${sanitizedValue}`;
+    }
+    
+    return `[REDACTED_${rng.nextAlphaNumeric(8)}]`;
+  }
+
+  generateSecretValueLogSafe(original) {
+    const hash = this.safeHash(original);
+    const rng = new this.SecureSeededRNG(hash);
+    
+    // Keep "secret " prefix and replace the value
+    return `secret [REDACTED_${rng.nextAlphaNumeric(8)}]`;
   }
 
   generateDatabaseConnectionSafe(original) {

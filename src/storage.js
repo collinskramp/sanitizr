@@ -971,6 +971,30 @@ class StorageModule {
         description: 'Detects internal hostnames (.internal, .local, .corp, .lan)'
       },
       
+      // Log format key-value patterns (API Key=value, Secret=value)
+      {
+        id: 'builtin_log_key_value',
+        type: 'builtin',
+        pattern: 'log_key_value',
+        replacement: null,
+        category: 'secrets',
+        enabled: true,
+        name: 'Log Key-Value Secrets',
+        description: 'Detects secrets in log format (API Key=, Secret=, Password=)'
+      },
+      
+      // Secret value in log format (secret actual_secret)
+      {
+        id: 'builtin_secret_value_log',
+        type: 'builtin',
+        pattern: 'secret_value_log',
+        replacement: null,
+        category: 'secrets',
+        enabled: true,
+        name: 'Secret Value in Logs',
+        description: 'Detects "secret value" patterns in log files'
+      },
+      
       // Key-Value Pattern Rules - CRITICAL MISSING PATTERNS
       {
         id: 'kv_password',
