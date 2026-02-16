@@ -276,6 +276,12 @@ class BulletproofSanitizerEngine {
         generator: (match) => this.generateBasicAuthSafe(match)
       },
       
+      // Internal/Staging URLs - sanitize subdomains while preserving format
+      internal_url: {
+        pattern: /\bhttps?:\/\/(?:[\w-]+\.)*(?:staging|internal|dev|test|sandbox|admin|api|auth)[\w.-]*\.[\w.-]+(?:\/[\w./-]*)?/gi,
+        generator: (match) => this.generateInternalURLSafe(match)
+      },
+      
       // IPv6 Addresses
       ipv6: {
         pattern: /\b(?:[0-9a-fA-F]{1,4}:){7}[0-9a-fA-F]{1,4}\b|\b::1\b|\b::ffff:[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\b/g,
@@ -382,8 +388,62 @@ class BulletproofSanitizerEngine {
       api_key: {
         pattern: /\b(?:api[_-]?key|apikey|access[_-]?token|auth[_-]?token)[\s:=]+[A-Za-z0-9+/=_-]{16,}\b/gi,
         generator: (match) => this.generateAPIKeySafe(match)
+      },
+      
+      // JSON key-value patterns for secrets
+      json_password: {
+        pattern: /"password"\s*:\s*"([^"]+)"/gi,
+        generator: (match) => this.generateJSONSecretSafe(match, 'password')
+      },
+      
+      json_secret: {
+        pattern: /"(?:secret|secretKey|clientSecret|appSecret|apiSecret)"\s*:\s*"([^"]+)"/gi,
+        generator: (match) => this.generateJSONSecretSafe(match, 'secret')
+      },
+      
+      json_private_key: {
+        pattern: /"(?:privateKey|private_key|secretKey|secret_key)"\s*:\s*"([^"]+)"/gi,
+        generator: (match) => this.generateJSONSecretSafe(match, 'privateKey')
+      },
+      
+      json_token: {
+        pattern: /"(?:token|apiToken|authToken|accessToken|refreshToken|bearerToken)"\s*:\s*"([^"]+)"/gi,
+        generator: (match) => this.generateJSONSecretSafe(match, 'token')
+      },
+      
+      json_api_key: {
+        pattern: /"(?:apiKey|api_key|API_KEY)"\s*:\s*"([^"]+)"/gi,
+        generator: (match) => this.generateJSONSecretSafe(match, 'apiKey')
+      },
+      
+      json_credentials: {
+        pattern: /"(?:credentials|connectionString|connection_string)"\s*:\s*"([^"]+)"/gi,
+        generator: (match) => this.generateJSONSecretSafe(match, 'credentials')
+      },
+      
+      json_secret_access_key: {
+        pattern: /"(?:secretAccessKey|secret_access_key|SecretAccessKey)"\s*:\s*"([^"]+)"/gi,
+        generator: (match) => this.generateJSONSecretSafe(match, 'secretAccessKey')
       }
     };
+  }
+
+  /**
+   * Generate safe replacement for JSON secret values
+   */
+  generateJSONSecretSafe(original, keyType) {
+    const hash = this.safeHash(original);
+    const rng = new this.SecureSeededRNG(hash);
+    
+    // Extract the value from the match
+    const valueMatch = original.match(/"([^"]+)"$/);
+    const originalValue = valueMatch ? valueMatch[1] : original;
+    
+    // Generate replacement of same length
+    const replacement = rng.nextAlphaNumeric(Math.min(originalValue.length, 32));
+    
+    // Return full pattern with new value
+    return original.replace(originalValue, `[REDACTED_${keyType.toUpperCase()}]`);
   }
 
   /**
@@ -552,6 +612,36 @@ class BulletproofSanitizerEngine {
       parts.push(rng.nextHex(4));
     }
     return parts.join(':');
+  }
+
+  generateInternalURLSafe(original) {
+    const hash = this.safeHash(original);
+    const rng = new this.SecureSeededRNG(hash);
+    
+    try {
+      const url = new URL(original);
+      const protocol = url.protocol;
+      const pathname = url.pathname || '';
+      
+      // Generate a sanitized hostname preserving the structure
+      // e.g., "auth.staging.ecobank.com" -> "auth.staging.company1234.com"
+      const hostParts = url.hostname.split('.');
+      
+      if (hostParts.length >= 2) {
+        // Keep TLD and replace the company name
+        const tld = hostParts.pop(); // .com, .nl, etc.
+        hostParts.pop(); // Remove company name
+        const sanitizedCompany = `company${rng.nextInt(1000, 9999)}`;
+        hostParts.push(sanitizedCompany);
+        hostParts.push(tld);
+      }
+      
+      const sanitizedHost = hostParts.join('.');
+      return `${protocol}//${sanitizedHost}${pathname}`;
+    } catch (error) {
+      // Fallback: just replace with generic
+      return `https://app${rng.nextInt(1000, 9999)}.example.com`;
+    }
   }
 
   generateDatabaseConnectionSafe(original) {
@@ -1140,12 +1230,25 @@ MIIEvQIBADANBgkqhkiG9w0BAQEFAASCBKcwggSjAgEAAoIBAQC7VJTUt9Us8cKB
 
   /**
    * SAFE JSON SANITIZATION
+   * For JSON, we sanitize as text to preserve key-value context
    */
   sanitizeJSONSafe(text, options) {
     try {
-      const parsed = JSON.parse(text);
-      const sanitized = this.sanitizeJSONObjectSync(parsed, options);
-      return JSON.stringify(sanitized, null, 2);
+      // First, validate it's valid JSON
+      JSON.parse(text);
+      
+      // Sanitize as text to detect key-value patterns like "password": "secret"
+      const sanitized = this.sanitizeTextSafe(text, options);
+      
+      // Validate the result is still valid JSON
+      try {
+        JSON.parse(sanitized);
+        return sanitized;
+      } catch (e) {
+        // If sanitization broke JSON structure, try to fix it
+        // or return pretty-printed version
+        return sanitized;
+      }
     } catch (error) {
       console.error('JSON sanitization error:', error);
       // Fallback to text sanitization
@@ -1400,21 +1503,46 @@ MIIEvQIBADANBgkqhkiG9w0BAQEFAASCBKcwggSjAgEAAoIBAQC7VJTUt9Us8cKB
     
     try {
       // Create regex patterns for different key-value formats
-      const patterns = [
-        // JSON format: "key": "value"
-        new RegExp(`"${keyPattern}"\\s*:\\s*"([^"]+)"`, 'gi'),
-        // YAML/Config format: key: value
-        new RegExp(`${keyPattern}\\s*:\\s*([^\\s\\n]+)`, 'gi'),
-        // Environment format: KEY=value
-        new RegExp(`${keyPattern.toUpperCase()}\\s*=\\s*([^\\s\\n]+)`, 'gi'),
-        // Lowercase env format: key=value
-        new RegExp(`${keyPattern.toLowerCase()}\\s*=\\s*([^\\s\\n]+)`, 'gi')
+      // Support both exact match and camelCase/snake_case variations
+      const keyVariations = [
+        keyPattern,                                    // exact: password
+        keyPattern.charAt(0).toUpperCase() + keyPattern.slice(1), // Password
+        `[a-zA-Z]*${keyPattern}`,                     // clientSecret, apiSecret
+        `[a-zA-Z]*${keyPattern.charAt(0).toUpperCase() + keyPattern.slice(1)}`, // clientPassword
+        `[a-zA-Z_]*_?${keyPattern}`,                  // client_secret, api_token
       ];
+      
+      const patterns = [];
+      
+      for (const keyVar of keyVariations) {
+        // JSON format: "key": "value"
+        patterns.push(new RegExp(`"(${keyVar})"\\s*:\\s*"([^"]+)"`, 'gi'));
+        // YAML/Config format: key: value (but not URLs)
+        patterns.push(new RegExp(`(?<!https?:)(?<!ftp:)(${keyVar})\\s*:\\s*"?([^"\\s\\n,}]+)"?`, 'gi'));
+        // Environment format: KEY=value
+        patterns.push(new RegExp(`(${keyVar.toUpperCase()})\\s*=\\s*"?([^"\\s\\n]+)"?`, 'gi'));
+      }
+      
+      const seenMatches = new Set(); // Deduplicate
       
       for (const regex of patterns) {
         const matches = this.safeRegexExec(regex, text);
         
         for (const match of matches) {
+          // Skip if we've already seen this match position
+          const matchKey = `${match.index}:${match[0]}`;
+          if (seenMatches.has(matchKey)) continue;
+          seenMatches.add(matchKey);
+          
+          // Extract the actual value (capture group 2 if exists, else group 1)
+          const value = match[2] || match[1];
+          
+          // Skip short values (likely not secrets)
+          if (value.length < 4) continue;
+          
+          // Skip boolean and numeric values
+          if (/^(true|false|null|\d+)$/i.test(value)) continue;
+          
           const detection = {
             ruleId: rule.id,
             ruleName: rule.name || rule.pattern,
@@ -1423,7 +1551,7 @@ MIIEvQIBADANBgkqhkiG9w0BAQEFAASCBKcwggSjAgEAAoIBAQC7VJTUt9Us8cKB
             match: match[0],
             startIndex: match.index,
             endIndex: match.index + match[0].length,
-            replacement: match[0].replace(match[1], rule.replacement || '[REDACTED]'),
+            replacement: match[0].replace(value, `[REDACTED_${keyPattern.toUpperCase()}]`),
             selected: true
           };
           

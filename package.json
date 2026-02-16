@@ -1,18 +1,14 @@
 {
-  "name": "aisanitizr",
-  "version": "2.0.0",
-  "description": "AISanitizr - Enterprise-grade data sanitization for AI workflows",
+  "name": "sanitizr",
+  "version": "2.1.0",
+  "description": "Sanitizr - Enterprise-grade data sanitization for AI workflows. Detect and mask PII, secrets, and sensitive data before sharing.",
   "main": "src/sanitizer-engine-bulletproof.js",
   "scripts": {
-    "start": "node server.js",
-    "dev": "node server.js --dev",
-    "build": "echo 'Static site - no build needed'",
-    "test": "node test/test-runner.js",
-    "test:comprehensive": "node test/test-comprehensive.js",
-    "test:coverage": "node test/test-coverage.js",
-    "lint": "eslint src/ --fix",
-    "serve": "http-server . -p 3000 -o",
-    "install-deps": "npm install"
+    "start": "NODE_ENV=production node server.js",
+    "dev": "NODE_ENV=development node server.js",
+    "test": "node tests/unit/test-json-secrets.js",
+    "test:all": "node tests/unit/test-runner.js",
+    "lint": "eslint src/ --fix"
   },
   "keywords": [
     "data-sanitization",
@@ -21,22 +17,21 @@
     "pii-detection",
     "sensitive-data",
     "client-side",
-    "bulletproof",
     "enterprise",
-    "modern-ui",
-    "aisanitizr",
-    "ai-safety"
+    "ai-safety",
+    "gdpr",
+    "redaction"
   ],
-  "author": "Data Sanitizer Team",
+  "author": "Sanitizr Team",
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "https://github.com/your-org/data-sanitizer-bulletproof.git"
+    "url": "https://github.com/collinskramp/sanitizr.git"
   },
   "bugs": {
-    "url": "https://github.com/your-org/data-sanitizer-bulletproof/issues"
+    "url": "https://github.com/collinskramp/sanitizr/issues"
   },
-  "homepage": "https://github.com/your-org/data-sanitizer-bulletproof#readme",
+  "homepage": "https://sanitizr.nl",
   "dependencies": {
     "express": "^4.18.2",
     "cors": "^2.8.5",
@@ -44,20 +39,9 @@
     "compression": "^1.7.4"
   },
   "devDependencies": {
-    "http-server": "^14.1.1",
-    "eslint": "^8.55.0",
-    "nodemon": "^3.0.2",
-    "concurrently": "^8.2.2"
+    "eslint": "^8.55.0"
   },
   "engines": {
-    "node": ">=14.0.0",
-    "npm": ">=6.0.0"
-  },
-  "files": [
-    "src/",
-    "public/",
-    "test/",
-    "README.md",
-    "LICENSE"
-  ]
+    "node": ">=18.0.0"
+  }
 }

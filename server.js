@@ -7,7 +7,7 @@ const compression = require('compression');
 const app = express();
 const PORT = process.env.PORT || 3001;
 const HOST = process.env.HOST || '127.0.0.1';
-const isDev = process.argv.includes('--dev');
+const isDev = process.env.NODE_ENV !== 'production';
 
 // Security middleware
 app.use(helmet({
@@ -34,14 +34,24 @@ if (isDev) {
 // Compression middleware
 app.use(compression());
 
-// Serve static files
-app.use(express.static('.', {
+// Serve static files from multiple directories
+app.use('/css', express.static(path.join(__dirname, 'public/css')));
+app.use('/js', express.static(path.join(__dirname, 'src')));
+app.use(express.static(__dirname, {
   index: 'index.html',
-  setHeaders: (res, path) => {
-    if (path.endsWith('.html')) {
-      res.setHeader('Cache-Control', 'no-cache');
-    } else if (path.endsWith('.js') || path.endsWith('.css')) {
-      res.setHeader('Cache-Control', 'public, max-age=31536000');
+  setHeaders: (res, filePath) => {
+    if (isDev) {
+      // No caching for development
+      res.setHeader('Cache-Control', 'no-cache, no-store, must-revalidate');
+      res.setHeader('Pragma', 'no-cache');
+      res.setHeader('Expires', '0');
+    } else {
+      // Production caching
+      if (filePath.endsWith('.html')) {
+        res.setHeader('Cache-Control', 'no-cache');
+      } else if (filePath.endsWith('.js') || filePath.endsWith('.css')) {
+        res.setHeader('Cache-Control', 'public, max-age=31536000');
+      }
     }
   }
 }));
@@ -66,22 +76,9 @@ app.get('/api/version', (req, res) => {
   });
 });
 
-// UI version routes
-app.get('/classic', (req, res) => {
-  res.sendFile(path.join(__dirname, 'index-bulletproof.html'));
-});
-
-app.get('/modern', (req, res) => {
-  res.sendFile(path.join(__dirname, 'index-modern.html'));
-});
-
-app.get('/v3', (req, res) => {
-  res.sendFile(path.join(__dirname, 'index-v3.html'));
-});
-
-// Fallback to v3 UI for SPA routing
+// Fallback to main UI
 app.get('*', (req, res) => {
-  res.sendFile(path.join(__dirname, 'index-v3.html'));
+  res.sendFile(path.join(__dirname, 'index.html'));
 });
 
 // Start server
@@ -89,8 +86,5 @@ app.listen(PORT, HOST, () => {
   console.log(`✓ AISanitizr`);
   console.log(`  http://${HOST}:${PORT}`);
   console.log(`  Engine: Bulletproof | Coverage: 90%+`);
-  
-  if (isDev) {
-    console.log(`  Settings: http://localhost:${PORT}/settings.html`);
-  }
+  console.log(`  Mode: ${isDev ? 'Development' : 'Production'}`);
 });

@@ -1,9 +1,30 @@
-node_modules
+# Dependencies
+node_modules/
 
-# Test files with fake secrets (for sanitizer testing)
-test-*.html
-test-*.js
-debug-*.html
-debug-*.js
-*.test.html
-*.test.js
+# Test files (contain fake secrets for testing)
+tests/
+
+# Build output
+dist/
+
+# Environment
+.env
+.env.local
+.env.*.local
+
+# IDE
+.idea/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+npm-debug.log*
+
+# Coverage
+coverage/

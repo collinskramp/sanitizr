@@ -947,6 +947,18 @@ class StorageModule {
         description: 'Detects Git repository URLs (GitHub, GitLab, Bitbucket)'
       },
       
+      // Internal/Staging URLs
+      {
+        id: 'builtin_internal_url',
+        type: 'builtin',
+        pattern: 'internal_url',
+        replacement: null,
+        category: 'company',
+        enabled: false,  // Disabled by default - user can enable if needed
+        name: 'Internal/Staging URLs',
+        description: 'Detects internal, staging, dev, test, sandbox URLs and sanitizes company names'
+      },
+      
       // Key-Value Pattern Rules - CRITICAL MISSING PATTERNS
       {
         id: 'kv_password',
@@ -984,12 +996,34 @@ class StorageModule {
       {
         id: 'kv_api_key',
         type: 'kv',
-        pattern: 'api_key',
+        pattern: 'apiKey',
         replacement: 'REDACTED_API_KEY',
         category: 'secrets',
         enabled: true,
         name: 'API Key Key-Value',
-        description: 'Detects API key values in key-value pairs'
+        description: 'Detects API key values in key-value pairs (camelCase)'
+      },
+      
+      {
+        id: 'kv_api_key_snake',
+        type: 'kv',
+        pattern: 'api_key',
+        replacement: 'REDACTED_API_KEY',
+        category: 'secrets',
+        enabled: true,
+        name: 'API Key Key-Value (snake_case)',
+        description: 'Detects API key values in key-value pairs (snake_case)'
+      },
+      
+      {
+        id: 'kv_private_key_camel',
+        type: 'kv',
+        pattern: 'privateKey',
+        replacement: 'REDACTED_PRIVATE_KEY',
+        category: 'secrets',
+        enabled: true,
+        name: 'Private Key Key-Value (camelCase)',
+        description: 'Detects private key values in key-value pairs (camelCase)'
       },
       
       {
