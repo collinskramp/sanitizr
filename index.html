@@ -642,9 +642,12 @@
         
         let currentDetections = [];
         let currentRules = storage.getRules();
-        let tabCounter = 1;
-        let tabs = [{ id: 1, title: 'Untitled', input: '', output: '', detections: [] }];
-        let activeTabId = 1;
+    let tabCounter = 1;
+    // Load persisted tabs if available
+    let tabs = storage.getTabs();
+    // Ensure tabCounter and activeTabId are initialized from persisted tabs
+    let activeTabId = (tabs && tabs.length > 0) ? tabs[0].id : 1;
+    tabCounter = tabs.reduce((max, t) => Math.max(max, t.id), tabCounter);
         
         const elements = {
             input: document.getElementById('input'),
@@ -830,7 +833,7 @@
             if (!tab.input || tab.input.trim() === '') {
                 return `<span class="tab-title">New</span>`;
             }
-            return `<span class="tab-title">${tab.title}</span>`;
+            return `<span class="tab-title" data-tab-id="${tab.id}">${escapeHtml(tab.title)}</span>`;
         }
 
         function renderTabs() {
@@ -859,6 +862,14 @@
                     if (!e.target.closest('.tab-close')) switchToTab(parseInt(tab.dataset.tabId));
                 });
             });
+
+            // Double-click to rename tab
+            document.querySelectorAll('.tab-title').forEach(titleEl => {
+                titleEl.addEventListener('dblclick', (e) => {
+                    const id = parseInt(e.target.dataset.tabId);
+                    startRenameTab(id, e.target);
+                });
+            });
             
             document.querySelectorAll('.tab-close').forEach(closeBtn => {
                 closeBtn.addEventListener('click', (e) => {
@@ -873,6 +884,7 @@
             tabs.push({ id: tabCounter, title: 'Untitled', input: '', output: '', detections: [] });
             switchToTab(tabCounter);
             renderTabs();
+            storage.saveTabs(tabs);
         }
 
         function closeTab(tabId) {
@@ -885,6 +897,7 @@
             tabs.splice(index, 1);
             if (activeTabId === tabId) switchToTab(tabs[Math.min(index, tabs.length - 1)].id);
             renderTabs();
+            storage.saveTabs(tabs);
         }
 
         function burnAllTabs() {
@@ -898,6 +911,7 @@
                 elements.statusBanner.classList.remove('show');
             }, 400);
             setTimeout(() => elements.fireOverlay.classList.remove('burning'), 800);
+            storage.saveTabs(tabs);
         }
 
         function switchToTab(tabId) {
@@ -910,6 +924,7 @@
             activeTabId = tabId;
             loadTabContent(tabs.find(t => t.id === tabId));
             renderTabs();
+                storage.saveTabs(tabs);
         }
 
         function loadTabContent(tab) {
@@ -927,7 +942,46 @@
                 tab.input = elements.input.value;
                 tab.title = text ? text.split('\n')[0].substring(0, 20) + (text.length > 20 ? '...' : '') : 'Untitled';
                 renderTabs();
+                storage.saveTabs(tabs);
             }
+        }
+
+        // Simple HTML escape for tab titles
+        function escapeHtml(str) {
+            return String(str)
+              .replace(/&/g, '&amp;')
+              .replace(/</g, '&lt;')
+              .replace(/>/g, '&gt;')
+              .replace(/"/g, '&quot;')
+              .replace(/'/g, '&#39;');
+        }
+
+        function startRenameTab(tabId, titleElement) {
+            const tab = tabs.find(t => t.id === tabId);
+            if (!tab) return;
+            const input = document.createElement('input');
+            input.type = 'text';
+            input.value = tab.title;
+            input.className = 'tab-rename-input';
+            input.style.minWidth = '80px';
+            titleElement.replaceWith(input);
+            input.focus();
+
+            function finish() {
+                const newTitle = input.value.trim() || 'Untitled';
+                tab.title = newTitle;
+                storage.saveTabs(tabs);
+                renderTabs();
+            }
+
+            input.addEventListener('blur', finish);
+            input.addEventListener('keydown', (e) => {
+                if (e.key === 'Enter') {
+                    input.blur();
+                } else if (e.key === 'Escape') {
+                    renderTabs();
+                }
+            });
         }
 
         elements.detectionHeader.addEventListener('click', () => elements.detectionSummary.classList.toggle('collapsed'));

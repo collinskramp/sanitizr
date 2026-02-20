@@ -721,6 +721,9 @@
                     <path stroke-linecap="round" stroke-linejoin="round" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z" />
                 </svg>
             </button>
+            <button class="btn btn-primary" id="saveBtn" title="Save settings" style="margin-left:12px;">
+                Save
+            </button>
         </div>
     </header>
     
@@ -1222,6 +1225,17 @@
                 option.classList.add('active');
                 saveSettings();
             });
+        });
+        
+        // Explicit Save button (keeps autosave intact)
+        document.getElementById('saveBtn').addEventListener('click', () => {
+            try {
+                saveSettings();
+                showToast('Settings saved');
+            } catch (e) {
+                console.error('Save failed', e);
+                showToast('Save failed');
+            }
         });
         
         // Custom Words

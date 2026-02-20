@@ -9,7 +9,8 @@ class StorageModule {
     this.keys = {
       rules: this.namespace + 'rules',
       profiles: this.namespace + 'profiles',
-      settings: this.namespace + 'settings',
+  settings: this.namespace + 'settings',
+  tabs: this.namespace + 'tabs',
       history: this.namespace + 'history',
       currentProfile: this.namespace + 'current-profile'
     };
@@ -55,6 +56,12 @@ class StorageModule {
         this.setItem(this.keys.history, []);
       }
 
+      // Initialize tabs storage if not present
+      if (!this.getItem(this.keys.tabs)) {
+        const defaultTabs = [{ id: 1, title: 'Untitled', input: '', output: '', detections: [] }];
+        this.setItem(this.keys.tabs, defaultTabs);
+      }
+
       // Set current profile to default if not set
       if (!this.getItem(this.keys.currentProfile)) {
         this.setItem(this.keys.currentProfile, 'default');
@@ -64,6 +71,25 @@ class StorageModule {
       console.error('Failed to initialize storage:', error);
       this.handleStorageError(error);
     }
+  }
+
+  /**
+   * Get persisted tabs
+   * @returns {Array<{id:number,title:string,input:string,output:string,detections:Array}>}
+   */
+  getTabs() {
+    const tabs = this.getItem(this.keys.tabs);
+    const defaultTabs = [{ id: 1, title: 'Untitled', input: '', output: '', detections: [] }];
+    return tabs || defaultTabs;
+  }
+
+  /**
+   * Save tabs to storage
+   * @param {Array} tabs
+   * @returns {boolean}
+   */
+  saveTabs(tabs) {
+    return this.setItem(this.keys.tabs, tabs);
   }
 
   /**
